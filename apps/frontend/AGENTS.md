@@ -8,6 +8,7 @@ This directory is intentionally a minimal Nuxt 4 scaffold. It contains no produc
 - Vue 3
 - Vue Router
 - Pinia
+- Nuxt Icon
 - Tailwind CSS 4
 - AlienMark workspace library
 - TypeScript
