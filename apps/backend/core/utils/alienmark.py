@@ -1,6 +1,5 @@
 import requests
 from django.conf import settings
-
 from drf_std_response import ServiceError
 
 

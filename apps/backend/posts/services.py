@@ -4,7 +4,7 @@ from notifications.services import notify_mentions, notify_subscribed_author_pos
 from .models import CommunityPost
 
 
-def create_community_post(*, author, body: str, mentions: list = None):
+def create_community_post(*, author, body: str, mentions: list | None = None):
     post = CommunityPost.objects.create(author=author, body=body, mentions=mentions or [])
     target = get_or_create_community_post_target(post)
     notify_mentions(
@@ -21,7 +21,7 @@ def create_community_post(*, author, body: str, mentions: list = None):
     return post
 
 
-def update_community_post(*, post: CommunityPost, body: str, mentions: list = None):
+def update_community_post(*, post: CommunityPost, body: str, mentions: list | None = None):
     previous_mentions = set(post.mentions)
     post.body = body
     if mentions is not None:

@@ -1,14 +1,14 @@
 from django.contrib import admin, messages
 
 from .models import (
-    Collection,
-    CollectionItem,
     Article,
-    ArticleSource,
+    ArticleEvent,
     ArticlePublication,
     ArticlePublicationVersion,
     ArticleSnapshot,
-    ArticleEvent,
+    ArticleSource,
+    Collection,
+    CollectionItem,
 )
 
 

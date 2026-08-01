@@ -1,17 +1,17 @@
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from django.db import transaction
-
-import secrets
-import random
 import hashlib
+import random
+import secrets
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db import transaction
 from drf_std_response import ServiceError
-from core.utils.cache import add_cache, set_cache, get_cache, delete_cache, incr_cache
+
 from bookmarks.models import BookmarkFolder
+from core.utils.cache import add_cache, delete_cache, get_cache, incr_cache, set_cache
+from logs.logging import get_logger
 from users.models import EmailAddress
 from users.tasks import send_verification_email_task
-from logs.logging import get_logger
 
 logger = get_logger(__name__)
 User = get_user_model()

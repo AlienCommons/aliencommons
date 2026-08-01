@@ -17,15 +17,14 @@ from bookmarks.models import Bookmark, BookmarkFolder
 from comments.models import Comment
 from core.models import ContentTarget
 from core.services.content_targets import (
-    get_or_create_comment_target,
     get_or_create_article_publication_target,
+    get_or_create_comment_target,
 )
+from posts.services import create_community_post as create_community_post_service
 from reactions.models import Reaction
 from reports.models import ContentReport, UserReport
-from posts.services import create_community_post as create_community_post_service
 
 from .helpers import unique_suffix
-
 
 User = get_user_model()
 

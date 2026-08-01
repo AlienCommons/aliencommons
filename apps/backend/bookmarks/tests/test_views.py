@@ -1,14 +1,13 @@
-from django.urls import reverse
 from django.conf import settings
-
+from django.urls import reverse
 from rest_framework import status
 
 from bookmarks.models import Bookmark, BookmarkFolder
 from core.tests.factories import (
+    create_article,
+    create_article_publication,
     create_bookmark,
     create_bookmark_folder,
-    create_article_publication,
-    create_article,
     create_user,
 )
 from core.tests.testcases import BaseAPITestCase

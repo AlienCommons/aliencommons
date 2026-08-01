@@ -1,6 +1,6 @@
-from django.utils import timezone
-
 from datetime import datetime, timedelta
+
+from django.utils import timezone
 
 
 def compute_next_enqueue_at(interval_seconds: float) -> datetime:

@@ -2,12 +2,12 @@ from types import SimpleNamespace
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from drf_std_response import ServiceError
+from drf_std_response.exception_handlers import exception_handler
 from rest_framework import status
 from rest_framework.exceptions import NotAuthenticated, ValidationError
 
 from core.tests.testcases import BaseTestCase
-from drf_std_response import ServiceError
-from drf_std_response.exception_handlers import exception_handler
 
 
 class CustomExceptionHandlerTests(BaseTestCase):

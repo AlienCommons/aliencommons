@@ -1,8 +1,7 @@
+from datetime import timedelta
 from unittest.mock import Mock, patch
 
 from django.utils import timezone
-
-from datetime import timedelta
 
 from core.tests.testcases import BaseTestCase
 from tasks.models import IntervalSchedule, PeriodicTask

@@ -1,13 +1,14 @@
+from dataclasses import dataclass
+
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 from django.utils import timezone
 from django.utils.module_loading import import_string
 
-from dataclasses import dataclass
-
 from core.utils.cache import get_key
 from logs.logging import get_logger
+
 from .models import PeriodicTask
 from .utils import compute_next_enqueue_at
 

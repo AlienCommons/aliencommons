@@ -1,10 +1,13 @@
+from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from drf_std_response import EnvelopeMixin
 from ..models import UserSubscription
-from ..serializers import UserSubscriptionReadSerializer, UserSubscriptionWriteSerializer
+from ..serializers import (
+    UserSubscriptionReadSerializer,
+    UserSubscriptionWriteSerializer,
+)
 
 
 class UserSubscriptionViewSet(EnvelopeMixin, ModelViewSet):

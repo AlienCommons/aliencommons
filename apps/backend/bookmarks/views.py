@@ -1,8 +1,8 @@
 from django.db.models import Count
+from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 
-from drf_std_response import EnvelopeMixin
 from .models import Bookmark, BookmarkFolder
 from .permissions import BookmarkOwnerOnly
 from .serializers import (

@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 
+from logs.logging import get_logger
 from tasks.models import IntervalSchedule, PeriodicTask
 from tasks.periodic_tasks_registry import periodic_tasks
 from tasks.utils import compute_next_enqueue_at
-from logs.logging import get_logger
 
 logger = get_logger(__name__)
 

@@ -1,26 +1,26 @@
-from django.urls import reverse
-
-from rest_framework import status
 from unittest.mock import patch
 
+from django.urls import reverse
+from rest_framework import status
+
+from articles.models import (
+    Article,
+    ArticleEvent,
+    ArticlePublication,
+    ArticleSnapshot,
+    Collection,
+    CollectionItem,
+)
 from core.tests.factories import (
+    create_article,
+    create_article_publication,
     create_article_snapshot,
     create_collection,
     create_collection_item,
     create_moderator,
-    create_article_publication,
-    create_article,
     create_user,
 )
 from core.tests.testcases import BaseAPITestCase
-from articles.models import (
-    ArticleEvent,
-    ArticleSnapshot,
-    Collection,
-    CollectionItem,
-    ArticlePublication,
-    Article,
-)
 
 
 class ArticleViewTests(BaseAPITestCase):

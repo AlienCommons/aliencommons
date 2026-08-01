@@ -1,21 +1,21 @@
 from django.db import IntegrityError, transaction
 
 from articles.models import (
+    Article,
     ArticleEvent,
+    ArticlePublication,
+    ArticlePublicationVersion,
     ArticleSnapshot,
     Collection,
     CollectionItem,
-    ArticlePublication,
-    ArticlePublicationVersion,
-    Article,
 )
 from articles.services.articles import ArticleWorkflow
 from core.models import ContentTarget
 from core.tests.factories import (
+    create_article,
+    create_article_publication,
     create_collection,
     create_collection_item,
-    create_article_publication,
-    create_article,
     create_user,
 )
 from core.tests.testcases import BaseTestCase
@@ -134,13 +134,12 @@ class ArticleModelTests(BaseTestCase):
         published = create_article_publication(article)
         create_collection_item(collection, published)
 
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                CollectionItem.objects.create(
-                    collection=collection,
-                    article_publication=published,
-                    position=2,
-                )
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            CollectionItem.objects.create(
+                collection=collection,
+                article_publication=published,
+                position=2,
+            )
 
     def test_collection_delete_removes_collection_items(self):
         collection = create_collection(author=self.author)

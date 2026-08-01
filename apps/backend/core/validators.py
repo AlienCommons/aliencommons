@@ -1,5 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
-
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from core.utils.file_types import FILE_TYPE_MAP
@@ -12,7 +12,7 @@ class PasswordValidator:
     def __call__(self, value):
         try:
             validate_password(value)
-        except Exception:
+        except DjangoValidationError:
             message = "Your password does not meet the requirement(s)"
             raise serializers.ValidationError(message)
 

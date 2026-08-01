@@ -1,13 +1,12 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
-
+from drf_std_response import EnvelopeMixin
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from drf_std_response import EnvelopeMixin
 from ..serializers import UserLoginSerializer
 from ..services.sessions import create_user_session, delete_user_session
 

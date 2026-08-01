@@ -1,5 +1,4 @@
 from django.core.validators import RegexValidator
-
 from rest_framework import serializers
 
 from ..utils import normalize_email

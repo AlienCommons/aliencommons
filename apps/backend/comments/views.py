@@ -1,15 +1,15 @@
 from django.db.models import Count, Q
+from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 
-from drf_std_response import EnvelopeMixin
 from .models import Comment
 from .permissions import CommentPermission
 from .serializers import CommentReadSerializer, CommentWriteSerializer
 from .services import (
     create_comment,
-    get_community_post_target,
     get_article_publication_target,
+    get_community_post_target,
     soft_delete_comment,
     update_comment,
 )

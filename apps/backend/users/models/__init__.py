@@ -4,10 +4,10 @@ from .sessions import UserSession as UserSession
 from .subscriptions import UserSubscription as UserSubscription
 
 __all__ = [
-    "User",
     "AvatarStorage",
-    "ProfileManager",
     "EmailAddress",
+    "ProfileManager",
+    "User",
     "UserSession",
     "UserSubscription",
 ]

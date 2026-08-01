@@ -1,14 +1,13 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import BaseUserManager
-from django.core.files.storage import FileSystemStorage
-from django.utils.encoding import filepath_to_uri
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-
 import uuid
 from pathlib import Path
 from urllib.parse import urljoin
+
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.files.storage import FileSystemStorage
+from django.db import models
+from django.utils.encoding import filepath_to_uri
+from django.utils.translation import gettext_lazy as _
 
 from core.model_mixins import UUIDPrimaryKeyMixin
 

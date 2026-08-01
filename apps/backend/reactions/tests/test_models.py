@@ -1,15 +1,15 @@
 from django.db import IntegrityError, transaction
 
-from articles.models import ArticlePublication, Article
+from articles.models import Article, ArticlePublication
+from core.models import ContentTarget
 from core.tests.factories import (
-    create_content_target,
-    create_article_publication,
-    create_reaction,
     create_article,
+    create_article_publication,
+    create_content_target,
+    create_reaction,
     create_user,
 )
 from core.tests.testcases import BaseTestCase
-from core.models import ContentTarget
 from reactions.models import Reaction
 
 
@@ -38,13 +38,12 @@ class ReactionModelTests(BaseTestCase):
         target = create_content_target(self.published)
         create_reaction(self.user, self.published, target=target)
 
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                Reaction.objects.create(
-                    user=self.user,
-                    target=target,
-                    reaction_type=Reaction.ReactionType.DISLIKE,
-                )
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Reaction.objects.create(
+                user=self.user,
+                target=target,
+                reaction_type=Reaction.ReactionType.DISLIKE,
+            )
 
     def test_article_publication_delete_cascades_content_target_and_reactions(self):
         target = create_content_target(self.published)

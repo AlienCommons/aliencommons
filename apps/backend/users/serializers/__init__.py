@@ -1,6 +1,9 @@
 from .emails import EmailVerifyRequestSerializer, EmailVerifyResponseSerializer
 from .sessions import UserLoginSerializer
-from .subscriptions import UserSubscriptionReadSerializer, UserSubscriptionWriteSerializer
+from .subscriptions import (
+    UserSubscriptionReadSerializer,
+    UserSubscriptionWriteSerializer,
+)
 from .users import (
     UserListSerializer,
     UserRegisterRequestSerializer,

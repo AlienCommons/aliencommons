@@ -1,7 +1,6 @@
 from contextvars import ContextVar
 
-
-_log_context = ContextVar('log_context', default={})
+_log_context = ContextVar('log_context', default=None)
 
 
 def get_log_context() -> dict:
@@ -13,7 +12,7 @@ def get_log_context() -> dict:
     - clear_log_context()
     - unbind_log_context()
     """
-    context_copy = dict(_log_context.get())
+    context_copy = dict(_log_context.get() or {})
     return context_copy
 
 
@@ -30,7 +29,7 @@ def add_log_context(**values) -> None:
     Merge the provided values into the current logging context.
     Accepts only keyword arguments.
     """
-    current_context = dict(_log_context.get())
+    current_context = dict(_log_context.get() or {})
     current_context.update(values)
 
     _log_context.set(current_context)

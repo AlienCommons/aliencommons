@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from core.model_mixins import UUIDPrimaryKeyMixin, CreatedAtMixin
+from core.model_mixins import CreatedAtMixin, UUIDPrimaryKeyMixin
 
 User = get_user_model()
 

@@ -1,9 +1,8 @@
+from drf_std_response import EnvelopeMixin, ServiceError
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
-
-from drf_std_response import EnvelopeMixin, ServiceError
 
 from .models import NotificationDelivery, NotificationEvent
 from .serializers import NotificationDeliverySerializer

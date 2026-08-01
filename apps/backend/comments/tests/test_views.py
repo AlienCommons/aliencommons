@@ -1,13 +1,12 @@
 from django.urls import reverse
-
 from rest_framework import status
 
 from comments.models import Comment
 from core.tests.factories import (
+    create_article,
+    create_article_publication,
     create_comment,
     create_community_post,
-    create_article_publication,
-    create_article,
     create_user,
 )
 from core.tests.testcases import BaseAPITestCase

@@ -1,13 +1,12 @@
-from django.conf import settings
-from django.utils import timezone
-from django.tasks import task
-
-from pathlib import Path
 import re
+from pathlib import Path
 from urllib.parse import urlparse
 
-from articles.models import ArticleSource
+from django.conf import settings
+from django.tasks import task
+from django.utils import timezone
 
+from articles.models import ArticleSource
 
 MARKDOWN_IMAGE_RE = re.compile(r"!\[[^\]]*]\(\s*(<[^>]+>|[^)\s]+)")
 
@@ -33,7 +32,7 @@ def _extract_media_relpaths_from_markdown(markdown):
             src = src[1:-1]
 
         # absolute url -> take path part
-        if src.startswith("http://") or src.startswith("https://"):
+        if src.startswith(("http://", "https://")):
             src = urlparse(src).path  # "/media/xxx"
 
         # only handle MEDIA_URL files

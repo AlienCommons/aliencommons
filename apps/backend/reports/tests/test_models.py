@@ -1,9 +1,9 @@
 from core.services.content_targets import get_or_create_article_publication_target
 from core.tests.factories import (
+    create_article,
+    create_article_publication,
     create_community_post,
     create_content_report,
-    create_article_publication,
-    create_article,
     create_user,
     create_user_report,
 )

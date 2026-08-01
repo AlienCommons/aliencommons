@@ -1,10 +1,10 @@
-from django.utils import timezone
-from django.contrib.auth import get_user_model
-
 import user_agents
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+from logs.logging import get_logger
 
 from ..models import UserSession
-from logs.logging import get_logger
 
 logger = get_logger(__name__)
 User = get_user_model()

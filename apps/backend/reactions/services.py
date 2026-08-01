@@ -3,8 +3,8 @@ from django.db import transaction
 from articles.models import ArticlePublication
 from core.models import ContentTarget
 from core.services.content_targets import (
-    get_or_create_community_post_target,
     get_or_create_article_publication_target,
+    get_or_create_community_post_target,
 )
 from posts.models import CommunityPost
 

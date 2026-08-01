@@ -1,11 +1,10 @@
-from django.contrib import admin
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 
 from bookmarks.models import BookmarkFolder
 from users.models import UserSubscription
-
 
 User = get_user_model()
 
