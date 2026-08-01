@@ -7,6 +7,3 @@ allowBuilds:
   "@parcel/watcher": true
   esbuild: true
   unrs-resolver: true
-
-overrides:
-  typescript: ^6.0.3
