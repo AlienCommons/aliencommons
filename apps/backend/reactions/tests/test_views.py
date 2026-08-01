@@ -1,16 +1,15 @@
 from django.urls import reverse
-
 from rest_framework import status
 
+from core.models import ContentTarget
 from core.tests.factories import (
-    create_community_post,
-    create_article_publication,
-    create_reaction,
     create_article,
+    create_article_publication,
+    create_community_post,
+    create_reaction,
     create_user,
 )
 from core.tests.testcases import BaseAPITestCase
-from core.models import ContentTarget
 from reactions.models import Reaction
 
 

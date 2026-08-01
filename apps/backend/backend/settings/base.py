@@ -1,7 +1,7 @@
 # from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
-
 from pathlib import Path
+
+from django.contrib import messages
 from environs import Env
 
 BASE_DIR = Path(__file__).resolve().parents[2]

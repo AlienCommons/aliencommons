@@ -1,13 +1,20 @@
-from .articles import Article, ArticleSource, ArticlePublication, ArticlePublicationVersion, ArticleSnapshot, ArticleEvent
+from .articles import (
+    Article,
+    ArticleEvent,
+    ArticlePublication,
+    ArticlePublicationVersion,
+    ArticleSnapshot,
+    ArticleSource,
+)
 from .collections import Collection, CollectionItem
 
 __all__ = [
     "Article",
-    "ArticleSource",
+    "ArticleEvent",
     "ArticlePublication",
     "ArticlePublicationVersion",
     "ArticleSnapshot",
-    "ArticleEvent",
+    "ArticleSource",
     "Collection",
     "CollectionItem",
 ]

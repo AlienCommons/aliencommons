@@ -5,7 +5,6 @@ from core.utils.markdown import render_markdown_mentions
 
 from .models import BaseReport, ContentReport, UserReport
 
-
 TERMINAL_REPORT_STATUSES = {
     BaseReport.ReportStatus.RESOLVED,
     BaseReport.ReportStatus.REJECTED,

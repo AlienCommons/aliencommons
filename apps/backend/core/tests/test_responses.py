@@ -1,9 +1,9 @@
 from types import SimpleNamespace
 
+from drf_std_response import format_response
 from rest_framework import status
 
 from core.tests.testcases import BaseTestCase
-from drf_std_response import format_response
 
 
 class FormatResponseTests(BaseTestCase):

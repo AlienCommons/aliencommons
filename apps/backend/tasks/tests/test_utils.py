@@ -1,8 +1,7 @@
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.utils import timezone
-
-from datetime import timedelta
 
 from core.tests.testcases import BaseTestCase
 from tasks.utils import compute_next_enqueue_at

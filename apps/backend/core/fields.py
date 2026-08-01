@@ -1,8 +1,8 @@
-from rest_framework import serializers
-from django.utils.dateparse import parse_datetime
-from django.utils.timezone import make_aware, is_naive
-
 from datetime import datetime
+
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import is_naive, make_aware
+from rest_framework import serializers
 
 
 class FlexibleDateTimeField(serializers.DateTimeField):

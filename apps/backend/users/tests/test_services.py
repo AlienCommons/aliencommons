@@ -1,9 +1,9 @@
 from unittest.mock import patch
 
 from django.conf import settings
+from drf_std_response import ServiceError
 
 from bookmarks.models import BookmarkFolder
-from drf_std_response import ServiceError
 from core.tests.factories import create_user
 from core.tests.testcases import BaseTestCase
 from core.utils.cache import get_cache, set_cache

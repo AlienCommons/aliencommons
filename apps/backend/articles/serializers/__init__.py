@@ -1,12 +1,12 @@
 from .articles import (
     ArticleActionResponseSerializer,
     ArticleEventSerializer,
-    ArticleSnapshotSerializer,
-    ImageUploadSerializer,
     ArticlePublicationSerializer,
     ArticlePublicationVersionSerializer,
     ArticleReadSerializer,
+    ArticleSnapshotSerializer,
     ArticleWriteSerializer,
+    ImageUploadSerializer,
 )
 from .collections import (
     CollectionItemReadSerializer,
@@ -18,14 +18,14 @@ from .collections import (
 __all__ = [
     "ArticleActionResponseSerializer",
     "ArticleEventSerializer",
+    "ArticlePublicationSerializer",
+    "ArticlePublicationVersionSerializer",
+    "ArticleReadSerializer",
     "ArticleSnapshotSerializer",
+    "ArticleWriteSerializer",
     "CollectionItemReadSerializer",
     "CollectionItemWriteSerializer",
     "CollectionReadSerializer",
     "CollectionWriteSerializer",
     "ImageUploadSerializer",
-    "ArticlePublicationSerializer",
-    "ArticlePublicationVersionSerializer",
-    "ArticleReadSerializer",
-    "ArticleWriteSerializer",
 ]

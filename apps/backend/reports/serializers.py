@@ -5,7 +5,6 @@ from core.models import ContentTarget
 
 from .models import BaseReport, ContentReport, UserReport
 
-
 User = get_user_model()
 
 

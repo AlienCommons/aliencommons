@@ -1,10 +1,9 @@
 from django.urls import reverse
-
 from rest_framework import status
 
+from comments.models import Comment
 from core.tests.factories import create_community_post, create_user
 from core.tests.testcases import BaseAPITestCase
-from comments.models import Comment
 from posts.models import CommunityPost
 from reactions.models import Reaction
 

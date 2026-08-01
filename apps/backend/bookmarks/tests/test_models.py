@@ -1,11 +1,12 @@
-from django.db import IntegrityError, transaction
 from django.conf import settings
+from django.db import IntegrityError, transaction
+
 from bookmarks.models import Bookmark, BookmarkFolder
 from core.tests.factories import (
+    create_article,
+    create_article_publication,
     create_bookmark,
     create_bookmark_folder,
-    create_article_publication,
-    create_article,
     create_user,
 )
 from core.tests.testcases import BaseTestCase
@@ -41,18 +42,16 @@ class BookmarkModelTests(BaseTestCase):
     def test_bookmark_folder_rejects_duplicate_name_per_user(self):
         create_bookmark_folder(user=self.user, name="Research")
 
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                create_bookmark_folder(user=self.user, name="Research")
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            create_bookmark_folder(user=self.user, name="Research")
 
     def test_bookmark_rejects_duplicate_article_publication_per_user(self):
         article = create_article()
         published = create_article_publication(article)
         create_bookmark(self.user, published)
 
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                create_bookmark(self.user, published)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            create_bookmark(self.user, published)
 
     def test_bookmark_folder_delete_removes_bookmarks(self):
         article = create_article()

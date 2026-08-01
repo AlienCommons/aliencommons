@@ -1,8 +1,8 @@
+from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 
 from core.utils.permissions import is_moderator
-from drf_std_response import EnvelopeMixin
 
 from .models import ContentReport, UserReport
 from .permissions import ReportPermission

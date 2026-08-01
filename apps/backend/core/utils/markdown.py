@@ -3,9 +3,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-
 from drf_std_response import ServiceError
-
 
 H1_RE = re.compile(r"^#(?!#)\s+(.+?)\s*$")
 CLOSING_HASHES_RE = re.compile(r"\s+#+\s*$")
@@ -112,10 +110,10 @@ def validate_markdown_mentions(*, body, mentions):
         )
 
     User = get_user_model()
-    existing_user_ids = set(
+    existing_user_ids = {
         str(user_id)
         for user_id in User.objects.filter(id__in=mentions).values_list("id", flat=True)
-    )
+    }
     missing_user_ids = [str(user_id) for user_id in mentions if str(user_id) not in existing_user_ids]
     if missing_user_ids:
         raise ServiceError(

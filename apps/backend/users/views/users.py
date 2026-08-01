@@ -1,12 +1,11 @@
 from django.contrib.auth import get_user_model
-
+from drf_std_response import EnvelopeMixin
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 
-from drf_std_response import EnvelopeMixin
 from ..serializers import (
     UserListSerializer,
     UserRegisterRequestSerializer,
@@ -15,7 +14,6 @@ from ..serializers import (
     UserUpdateSerializer,
 )
 from ..services.users import register
-
 
 User = get_user_model()
 

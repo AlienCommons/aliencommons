@@ -1,14 +1,15 @@
-from django.utils import timezone
-
 from datetime import timedelta
 from unittest.mock import patch
 
+from django.utils import timezone
+from drf_std_response import ServiceError
+
 from articles.models import (
+    Article,
     ArticleEvent,
-    ArticleSnapshot,
     ArticlePublication,
     ArticlePublicationVersion,
-    Article,
+    ArticleSnapshot,
 )
 from articles.services.articles import (
     approve,
@@ -19,12 +20,11 @@ from articles.services.articles import (
     unpublish,
     withdraw,
 )
-from drf_std_response import ServiceError
 from core.tests.factories import (
+    create_article,
+    create_article_publication,
     create_article_snapshot,
     create_moderator,
-    create_article_publication,
-    create_article,
     create_user,
 )
 from core.tests.testcases import BaseTestCase

@@ -1,15 +1,16 @@
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.utils import timezone
 
-from datetime import datetime, timedelta
-
 from logs.logging import get_logger
+
 from .services.sessions import update_last_accessed_at
 
 logger = get_logger(__name__)
 
 
-class SessionTrackingMiddleware():
+class SessionTrackingMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 

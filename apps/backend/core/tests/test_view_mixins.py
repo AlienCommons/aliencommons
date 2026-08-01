@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.urls import path
 from django.test import override_settings
-
+from django.urls import path
+from drf_std_response import EnvelopeMixin
 from rest_framework import serializers, status
 from rest_framework.mixins import ListModelMixin
 from rest_framework.test import APIRequestFactory
@@ -11,8 +11,6 @@ from articles.models import Article
 from core.pagination import StandardPagination
 from core.tests.factories import create_article
 from core.tests.testcases import BaseTestCase
-from drf_std_response import EnvelopeMixin
-
 
 User = get_user_model()
 

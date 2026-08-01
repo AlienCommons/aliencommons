@@ -1,7 +1,7 @@
 from django.utils import timezone
 
-from logs.logging.context import add_log_context, clear_log_context
 from logs.logging import get_logger
+from logs.logging.context import add_log_context, clear_log_context
 
 logger = get_logger(__name__)
 

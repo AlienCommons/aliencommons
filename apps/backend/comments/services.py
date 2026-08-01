@@ -1,12 +1,12 @@
 from django.db import transaction
+from drf_std_response import ServiceError
 
 from articles.models import ArticlePublication
-from drf_std_response import ServiceError
 from core.models import ContentTarget
 from core.services.content_targets import (
+    get_or_create_article_publication_target,
     get_or_create_comment_target,
     get_or_create_community_post_target,
-    get_or_create_article_publication_target,
 )
 from notifications.services import notify_comment_reply, notify_mentions
 from posts.models import CommunityPost

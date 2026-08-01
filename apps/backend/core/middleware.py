@@ -1,6 +1,6 @@
-from django.utils import timezone
-
 import uuid
+
+from django.utils import timezone
 
 
 class RequestMetaMiddleware:

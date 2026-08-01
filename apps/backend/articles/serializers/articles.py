@@ -1,29 +1,27 @@
-from pathlib import Path
 import io
 import uuid
+from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
+from drf_std_response import ServiceError
 from PIL import Image
 from rest_framework import serializers
 
-from core.validators import (
-    FileTypeValidator, FileSizeValidator
-)
-from drf_std_response import ServiceError
+from core.validators import FileSizeValidator, FileTypeValidator
+
 from ..models import (
     Article,
-    ArticleSource,
+    ArticleEvent,
     ArticlePublication,
     ArticlePublicationVersion,
     ArticleSnapshot,
-    ArticleEvent,
+    ArticleSource,
 )
 from ..services.markdown import extract_title_from_markdown
-
 
 User = get_user_model()
 

@@ -1,7 +1,6 @@
+from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-
-from drf_std_response import EnvelopeMixin
 
 from .models import CommunityPost
 from .permissions import CommunityPostPermission

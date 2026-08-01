@@ -3,9 +3,9 @@ from comments.models import Comment
 from core.models import ContentTarget
 from core.services.content_targets import get_or_create_article_publication_target
 from core.tests.factories import (
-    create_comment,
-    create_article_publication,
     create_article,
+    create_article_publication,
+    create_comment,
     create_user,
 )
 from core.tests.testcases import BaseTestCase

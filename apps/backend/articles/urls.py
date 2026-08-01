@@ -1,14 +1,13 @@
 from rest_framework import routers
 
 from .views import (
-    ArticleViewSet,
+    ArticleEventReadViewset,
     ArticlePublicationViewSet,
     ArticleSnapshotViewSet,
-    ArticleEventReadViewset,
-    CollectionViewSet,
+    ArticleViewSet,
     CollectionItemViewSet,
+    CollectionViewSet,
 )
-
 
 router = routers.SimpleRouter()
 

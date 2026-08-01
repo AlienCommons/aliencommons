@@ -1,10 +1,12 @@
 from comments.services import create_comment
 from core.tests.factories import (
-    create_comment as create_comment_record,
-    create_community_post,
-    create_article_publication,
     create_article,
+    create_article_publication,
+    create_community_post,
     create_user,
+)
+from core.tests.factories import (
+    create_comment as create_comment_record,
 )
 from core.tests.testcases import BaseTestCase
 from notifications.models import NotificationEvent

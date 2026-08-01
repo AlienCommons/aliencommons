@@ -1,19 +1,19 @@
+import io
+
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-
+from PIL import Image
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-import io
-from PIL import Image
 
 from core.validators import (
     FileSizeValidator,
     FileTypeValidator,
     PasswordValidator,
 )
+
 from ..models import EmailAddress
 from ..utils import normalize_email
-
 
 User = get_user_model()
 
@@ -162,11 +162,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         username = validated_data.get('username', None)
         if username is not None:
-            setattr(instance, 'username', username)
+            instance.username = username
 
         signature = validated_data.get('signature', None)
         if signature is not None:
-            setattr(instance, 'signature', signature)
+            instance.signature = signature
 
         avatar = validated_data.get('avatar', None)
         if avatar is not None:

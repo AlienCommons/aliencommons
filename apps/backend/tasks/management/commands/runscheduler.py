@@ -1,10 +1,10 @@
-from django.core.management.base import BaseCommand
-
 import time
 
-from tasks.schedulers import enqueue_due_tasks
-from tasks.models import PeriodicTask
+from django.core.management.base import BaseCommand
+
 from logs.logging.logger import get_logger
+from tasks.models import PeriodicTask
+from tasks.schedulers import enqueue_due_tasks
 
 logger = get_logger(__name__)
 

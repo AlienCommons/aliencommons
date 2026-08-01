@@ -89,13 +89,11 @@ class UserModelTests(BaseTestCase):
         author = create_user(username="author")
         UserSubscription.objects.create(subscriber=subscriber, subscribed_to=author)
 
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                UserSubscription.objects.create(subscriber=subscriber, subscribed_to=author)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            UserSubscription.objects.create(subscriber=subscriber, subscribed_to=author)
 
     def test_user_subscription_rejects_self_subscription(self):
         user = create_user(username="reader")
 
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                UserSubscription.objects.create(subscriber=user, subscribed_to=user)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            UserSubscription.objects.create(subscriber=user, subscribed_to=user)
