@@ -4,6 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from core.openapi.serializers import CountSchemaSerializer, UpdatedCountSchemaSerializer
+
 from .models import NotificationDelivery, NotificationEvent
 from .serializers import NotificationDeliverySerializer
 from .services import mark_all_deliveries_read, mark_delivery_read
@@ -18,6 +20,14 @@ class NotificationDeliveryViewSet(EnvelopeMixin, ReadOnlyModelViewSet):
         "event__actor",
         "event__target",
     )
+    openapi_request_serializer_mapping = {
+        "mark_read": None,
+        "mark_all_read": None,
+    }
+    openapi_response_serializer_mapping = {
+        "unread_count": CountSchemaSerializer,
+        "mark_all_read": UpdatedCountSchemaSerializer,
+    }
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(recipient=self.request.user)

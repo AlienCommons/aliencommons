@@ -6,6 +6,7 @@ from .articles import (
     ArticleReadSerializer,
     ArticleSnapshotSerializer,
     ArticleWriteSerializer,
+    ImageUploadResponseSerializer,
     ImageUploadSerializer,
 )
 from .collections import (
@@ -27,5 +28,6 @@ __all__ = [
     "CollectionItemWriteSerializer",
     "CollectionReadSerializer",
     "CollectionWriteSerializer",
+    "ImageUploadResponseSerializer",
     "ImageUploadSerializer",
 ]

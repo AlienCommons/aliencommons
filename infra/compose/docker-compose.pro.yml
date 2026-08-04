@@ -43,7 +43,15 @@ services:
       - "traefik.http.routers.backend-production.rule=Host(`api.aliencommons.com`)"
       - "traefik.http.routers.backend-production.entrypoints=websecure"
       - "traefik.http.routers.backend-production.middlewares=web-secure@file"
+      - "traefik.http.routers.backend-production.service=backend-production"
       - "traefik.http.routers.backend-production.tls.certresolver=le"
+      - "traefik.http.routers.backend-api-same-origin-production.rule=Host(`aliencommons.com`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend-api-same-origin-production.entrypoints=websecure"
+      - "traefik.http.routers.backend-api-same-origin-production.middlewares=backend-api-strip-prefix-production,web-secure@file"
+      - "traefik.http.routers.backend-api-same-origin-production.priority=100"
+      - "traefik.http.routers.backend-api-same-origin-production.service=backend-production"
+      - "traefik.http.routers.backend-api-same-origin-production.tls.certresolver=le"
+      - "traefik.http.middlewares.backend-api-strip-prefix-production.stripprefix.prefixes=/api"
       - "traefik.http.services.backend-production.loadbalancer.server.port=8000"
     networks:
       - default

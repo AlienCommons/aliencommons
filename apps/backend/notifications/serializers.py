@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from users.serializers import UserListSerializer
@@ -12,6 +13,7 @@ class NotificationDeliverySerializer(serializers.ModelSerializer):
     target = serializers.SerializerMethodField()
     payload = serializers.JSONField(source="event.payload", read_only=True)
 
+    @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_target(self, obj):
         if obj.event.target_id is None:
             return None

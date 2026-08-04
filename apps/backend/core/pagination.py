@@ -3,6 +3,25 @@ from rest_framework.response import Response
 
 
 class StandardPagination(PageNumberPagination):
+    def get_paginated_response_schema(self, schema):
+        return {
+            "type": "object",
+            "required": [
+                "count",
+                "total_pages",
+                "current_page",
+                "page_size",
+                "results",
+            ],
+            "properties": {
+                "count": {"type": "integer", "example": 123},
+                "total_pages": {"type": "integer", "example": 7},
+                "current_page": {"type": "integer", "example": 1},
+                "page_size": {"type": "integer", "example": 20},
+                "results": schema,
+            },
+        }
+
     def get_paginated_response(self, data):
         return Response(
             {

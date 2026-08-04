@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import Bookmark, BookmarkFolder
@@ -24,6 +25,7 @@ class BookmarkFolderReadSerializer(serializers.ModelSerializer):
             "updated_at",
         )
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_bookmark_count(self, obj):
         annotated_value = getattr(obj, "bookmark_count", None)
         if annotated_value is not None:
@@ -78,6 +80,7 @@ class BookmarkReadSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_article_publication_title(self, obj):
         latest_version = obj.article_publication.latest_version()
         return latest_version.title if latest_version else None

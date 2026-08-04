@@ -175,6 +175,13 @@ jobs:
           users
           manage.py
 
+      - name: Validate committed OpenAPI schema
+        env:
+          DJANGO_SETTINGS_MODULE: backend.settings.test
+        run: |
+          uv run --project ../.. --package aliencommons-backend python manage.py spectacular --file openapi/v1.yaml --validate --fail-on-warn
+          git diff --exit-code -- openapi/v1.yaml
+
   backend-tests:
     runs-on: ubuntu-latest
     needs: changes

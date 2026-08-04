@@ -1,5 +1,5 @@
 from .emails import EmailVerifyRequestSerializer, EmailVerifyResponseSerializer
-from .sessions import UserLoginSerializer
+from .sessions import CsrfTokenSerializer, UserLoginSerializer
 from .subscriptions import (
     UserSubscriptionReadSerializer,
     UserSubscriptionWriteSerializer,
@@ -13,6 +13,7 @@ from .users import (
 )
 
 __all__ = [
+    "CsrfTokenSerializer",
     "EmailVerifyRequestSerializer",
     "EmailVerifyResponseSerializer",
     "UserListSerializer",

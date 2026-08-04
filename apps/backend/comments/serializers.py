@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field, inline_serializer
 from drf_std_response import ServiceError
 from rest_framework import serializers
 
@@ -41,22 +42,36 @@ class CommentReadSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
+    @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_article_publication(self, obj):
         if obj.parent_id is not None:
             return obj.parent.target.article_publication_id
         return obj.target.article_publication_id
 
+    @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_community_post(self, obj):
         if obj.parent_id is not None:
             return obj.parent.target.community_post_id
         return obj.target.community_post_id
 
+    @extend_schema_field(serializers.CharField())
     def get_render_body(self, obj):
         return render_markdown_mentions(obj.body, obj.mentions)
 
+    @extend_schema_field(
+        inline_serializer(
+            name="CommentMentionUser",
+            many=True,
+            fields={
+                "user_id": serializers.UUIDField(),
+                "username": serializers.CharField(),
+            },
+        )
+    )
     def get_mention_users(self, obj):
         return serialize_markdown_mentions(obj.mentions)
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_reply_count(self, obj):
         annotated_value = getattr(obj, "reply_count", None)
         if annotated_value is not None:

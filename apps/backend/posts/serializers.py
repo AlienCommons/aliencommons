@@ -1,4 +1,5 @@
 from django.db import models
+from drf_spectacular.utils import extend_schema_field, inline_serializer
 from drf_std_response import ServiceError
 from rest_framework import serializers
 
@@ -23,23 +24,37 @@ class CommunityPostReadSerializer(serializers.ModelSerializer):
     my_reaction = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_author_username(self, obj):
         if obj.author is None:
             return None
         return obj.author.username
 
+    @extend_schema_field(serializers.CharField())
     def get_render_body(self, obj):
         return render_markdown_mentions(obj.body, obj.mentions)
 
+    @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_content_target(self, obj):
         try:
             return str(obj.content_target.id)
         except CommunityPost.content_target.RelatedObjectDoesNotExist:
             return None
 
+    @extend_schema_field(
+        inline_serializer(
+            name="CommunityPostMentionUser",
+            many=True,
+            fields={
+                "user_id": serializers.UUIDField(),
+                "username": serializers.CharField(),
+            },
+        )
+    )
     def get_mention_users(self, obj):
         return serialize_markdown_mentions(obj.mentions)
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_like_count(self, obj):
         annotated_value = getattr(obj, "like_count", None)
         if annotated_value is not None:
@@ -55,6 +70,7 @@ class CommunityPostReadSerializer(serializers.ModelSerializer):
             reaction_type=Reaction.ReactionType.LIKE,
         ).count()
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_dislike_count(self, obj):
         annotated_value = getattr(obj, "dislike_count", None)
         if annotated_value is not None:
@@ -70,6 +86,7 @@ class CommunityPostReadSerializer(serializers.ModelSerializer):
             reaction_type=Reaction.ReactionType.DISLIKE,
         ).count()
 
+    @extend_schema_field(serializers.IntegerField(allow_null=True))
     def get_my_reaction(self, obj):
         annotated_value = getattr(obj, "my_reaction", None)
         if annotated_value is not None:
@@ -90,6 +107,7 @@ class CommunityPostReadSerializer(serializers.ModelSerializer):
             .first()
         )
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_comment_count(self, obj):
         annotated_value = getattr(obj, "comment_count", None)
         if annotated_value is not None:

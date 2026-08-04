@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.decorators import action
@@ -6,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from articles.models import ArticlePublication
+from core.openapi.serializers import DeletedResultSchemaSerializer
 from posts.models import CommunityPost
 
 from .models import Reaction
@@ -41,6 +44,10 @@ class ReactionViewSet(EnvelopeMixin, ModelViewSet):
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
+    @extend_schema(
+        request=ReactionWriteSerializer,
+        responses={200: ReactionReadSerializer, 201: ReactionReadSerializer},
+    )
     def create(self, request, *args, **kwargs):
         input_serializer = ReactionWriteSerializer(
             data=request.data,
@@ -104,6 +111,18 @@ class ReactionViewSet(EnvelopeMixin, ModelViewSet):
         kwargs["partial"] = True
         return self.update(request, *args, **kwargs)
 
+    @extend_schema(
+        request=None,
+        parameters=[
+            OpenApiParameter(
+                name="article_publication_id",
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        responses={200: DeletedResultSchemaSerializer},
+    )
     @action(
         detail=False,
         methods=["delete"],
@@ -123,6 +142,18 @@ class ReactionViewSet(EnvelopeMixin, ModelViewSet):
             status_code=status.HTTP_200_OK,
         )
 
+    @extend_schema(
+        request=None,
+        parameters=[
+            OpenApiParameter(
+                name="community_post_id",
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ],
+        responses={200: DeletedResultSchemaSerializer},
+    )
     @action(
         detail=False,
         methods=["delete"],
