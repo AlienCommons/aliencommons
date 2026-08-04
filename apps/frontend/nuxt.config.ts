@@ -11,6 +11,12 @@ export default defineNuxtConfig({
     fallbackToApi: false,
   },
   modules: ["@pinia/nuxt", "@nuxt/icon"],
+  runtimeConfig: {
+    apiInternalBase: "",
+    public: {
+      apiBase: "/api",
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

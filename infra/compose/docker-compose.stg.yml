@@ -34,6 +34,8 @@ services:
       dockerfile: apps/backend/Dockerfile
     working_dir: /code/apps/backend
     restart: unless-stopped
+    environment:
+      INTERNAL_ALLOWED_HOSTS: backend-api
     command: >
       sh -c "daphne -b 0.0.0.0 -p 8000 backend.asgi:application"
     depends_on:
@@ -164,6 +166,9 @@ services:
       context: ../..
       dockerfile: apps/frontend/Dockerfile
     restart: unless-stopped
+    environment:
+      NUXT_API_INTERNAL_BASE: http://backend-api:8000
+      NUXT_PUBLIC_API_BASE: /api
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend-stg.rule=Host(`stg.aliencommons.com`)"
