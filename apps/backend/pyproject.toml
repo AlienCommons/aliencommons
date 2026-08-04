@@ -12,7 +12,7 @@ dependencies = [
   "django-tasks-rq==0.12.0",
   "djangorestframework==3.17.1",
   "drf-std-response==0.1.0",
-  "environs==15.0.1",
+  "environs==15.1.0",
   "pillow==12.3.0",
   "psycopg[binary]==3.3.4",
   "requests==2.34.2",
