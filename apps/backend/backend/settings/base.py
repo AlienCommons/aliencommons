@@ -14,7 +14,10 @@ ABSOLUTE_URL_OVERRIDES = {}
 
 ADMINS = []
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+ALLOWED_HOSTS = [
+    *env.list("ALLOWED_HOSTS", default=[]),
+    *env.list("INTERNAL_ALLOWED_HOSTS", default=[]),
+]
 
 APPEND_SLASH = True
 
@@ -45,7 +48,7 @@ CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
 CSRF_FAILURE_VIEW = "core.csrf.csrf_failure"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
-CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
 DATABASES = {
     "default": {

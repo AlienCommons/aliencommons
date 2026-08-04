@@ -15,6 +15,7 @@ export default defineConfig({
       "**/.output/**",
       "**/dist/**",
       "**/coverage/**",
+      "**/app/api/generated/**",
     ],
     overrides: [
       {
@@ -71,6 +72,7 @@ export default defineConfig({
     ignorePatterns: [
       "apps/frontend/.nuxt",
       "apps/frontend/.output",
+      "apps/frontend/app/api/generated",
       ".nuxt",
       ".output",
       ".dist",
