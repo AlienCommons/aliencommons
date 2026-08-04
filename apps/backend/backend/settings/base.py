@@ -43,7 +43,7 @@ CSRF_COOKIE_PATH = "/"
 CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SECURE = False
 CSRF_USE_SESSIONS = False
-CSRF_FAILURE_VIEW = "django.views.csrf.csrf_failure"
+CSRF_FAILURE_VIEW = "core.csrf.csrf_failure"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_TRUSTED_ORIGINS = []
 
@@ -168,6 +168,7 @@ INSTALLED_APPS = [
     "tasks.apps.TasksConfig",
     "corsheaders",
     "rest_framework",
+    "drf_spectacular",
     "storages",
     "django_filters",
     "django_rq",
@@ -432,6 +433,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_SCHEMA_CLASS": "core.openapi.schema.EnvelopeAutoSchema",
     "DEFAULT_THROTTLE_CLASSES": [],
     "DEFAULT_CONTENT_NEGOTIATION_CLASS": "rest_framework.negotiation.DefaultContentNegotiation",
     "DEFAULT_PAGINATION_CLASS": "core.pagination.StandardPagination",
@@ -444,6 +446,20 @@ REST_FRAMEWORK = {
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 CORS_ALLOW_CREDENTIALS = True
+CORS_URLS_REGEX = r"^/v1/.*$"
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "AlienCommons API",
+    "DESCRIPTION": "HTTP API for the AlienCommons community platform.",
+    "VERSION": "1.0.0",
+    "OAS_VERSION": "3.0.3",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "ArticleStatusEnum": "core.openapi.enums.ARTICLE_STATUS_CHOICES",
+        "ReportStatusEnum": "core.openapi.enums.REPORT_STATUS_CHOICES",
+    },
+}
 
 RQ_QUEUES = {
     "default": {

@@ -22,6 +22,7 @@ from ..serializers import (
     ArticleReadSerializer,
     ArticleSnapshotSerializer,
     ArticleWriteSerializer,
+    ImageUploadResponseSerializer,
     ImageUploadSerializer,
 )
 from ..services.articles import (
@@ -40,6 +41,24 @@ class ArticleViewSet(EnvelopeMixin, ModelViewSet):
     queryset = Article.objects.select_related("author", "source")
     filter_backends = [filters.DjangoFilterBackend]
     filterset_class = ArticleFilter
+    openapi_request_serializer_mapping = {
+        "upload_images": ImageUploadSerializer,
+        "submit": None,
+        "withdraw": None,
+        "approve": None,
+        "reject": None,
+        "unpublish": None,
+        "trash": None,
+    }
+    openapi_response_serializer_mapping = {
+        "upload_images": ImageUploadResponseSerializer,
+        "submit": ArticleActionResponseSerializer,
+        "withdraw": ArticleActionResponseSerializer,
+        "approve": ArticleActionResponseSerializer,
+        "reject": ArticleActionResponseSerializer,
+        "unpublish": ArticleActionResponseSerializer,
+        "trash": ArticleActionResponseSerializer,
+    }
 
     permission_class_mapping = {
         'create': [IsAuthenticated],
@@ -261,6 +280,9 @@ class ArticleSnapshotViewSet(EnvelopeMixin, ReadOnlyModelViewSet):
     queryset = ArticleSnapshot.objects.all()
     serializer_class = ArticleSnapshotSerializer
     permission_classes = [ModeratorOnly]
+    openapi_response_serializer_mapping = {
+        "pending_ones": ArticleSnapshotSerializer(many=True),
+    }
 
     @action(detail=False, methods=['get'])
     def pending_ones(self, request):

@@ -28,6 +28,13 @@ class UserViewSet(EnvelopeMixin,
     queryset = User.objects.order_by("-date_joined")
     parser_classes = (MultiPartParser, FormParser, JSONParser)
     default_serializer_class = UserRetrieveSerializer
+    openapi_request_serializer_mapping = {
+        "create": UserRegisterRequestSerializer,
+        ("me", "PATCH"): UserUpdateSerializer,
+    }
+    openapi_response_serializer_mapping = {
+        ("me", "PATCH"): UserUpdateSerializer,
+    }
 
     serializer_class_mapping = {
         'list': UserListSerializer,

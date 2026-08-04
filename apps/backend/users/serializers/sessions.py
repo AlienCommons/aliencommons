@@ -23,3 +23,7 @@ class UserLoginSerializer(serializers.Serializer):
         Return a normalized email.
         """
         return normalize_email(value)
+
+
+class CsrfTokenSerializer(serializers.Serializer):
+    csrf_token = serializers.CharField(read_only=True)

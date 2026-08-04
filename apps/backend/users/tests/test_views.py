@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from bookmarks.models import BookmarkFolder
 from core.tests.factories import create_user
@@ -288,6 +289,97 @@ class SessionViewTests(BaseAPITestCase):
         self.assertEqual(user_session.browser, "Chrome")
         self.assertEqual(user_session.os, "Mac OS X")
         self.assertEqual(user_session.last_accessed_at, response.wsgi_request.timestamp.date())
+
+    def test_csrf_endpoint_sets_host_only_cookie_and_returns_token(self):
+        response = self.client.get(reverse("session-csrf"))
+
+        self.assert_success_response(
+            response,
+            status_code=status.HTTP_200_OK,
+            code="csrf_token_issued",
+            message="CSRF token issued",
+        )
+        self.assertTrue(response.data["data"]["csrf_token"])
+        self.assertIn(settings.CSRF_COOKIE_NAME, response.cookies)
+        self.assertEqual(response.cookies[settings.CSRF_COOKIE_NAME]["domain"], "")
+
+    def test_login_rejects_request_without_csrf_token(self):
+        csrf_client = APIClient(enforce_csrf_checks=True)
+
+        response = csrf_client.post(
+            reverse("session-login"),
+            {
+                "email": self.email_address.email,
+                "password": "secret123",
+            },
+            format="json",
+        )
+
+        payload = response.json()
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(payload["success"])
+        self.assertEqual(payload["code"], "csrf_failed")
+        self.assertIsNone(payload["data"])
+        self.assertEqual(payload["errors"][0]["code"], "csrf_failed")
+        self.assertFalse(UserSession.objects.exists())
+        self.assertNotIn("_auth_user_id", csrf_client.session)
+
+    def test_login_accepts_token_from_csrf_endpoint_on_same_origin(self):
+        csrf_client = APIClient(enforce_csrf_checks=True)
+        csrf_response = csrf_client.get(
+            reverse("session-csrf"),
+            secure=True,
+            HTTP_HOST="aliencommons.com",
+        )
+        token = csrf_response.data["data"]["csrf_token"]
+
+        response = csrf_client.post(
+            reverse("session-login"),
+            {
+                "email": self.email_address.email,
+                "password": "secret123",
+            },
+            format="json",
+            secure=True,
+            HTTP_HOST="aliencommons.com",
+            HTTP_ORIGIN="https://aliencommons.com",
+            HTTP_X_CSRFTOKEN=token,
+        )
+
+        self.assert_success_response(
+            response,
+            status_code=status.HTTP_200_OK,
+            code="user_login",
+            message="user login successfully",
+        )
+        self.assertEqual(str(csrf_client.session["_auth_user_id"]), str(self.user.id))
+        self.assertTrue(UserSession.objects.filter(user=self.user).exists())
+
+    def test_login_rejects_cross_origin_even_with_valid_token(self):
+        csrf_client = APIClient(enforce_csrf_checks=True)
+        csrf_response = csrf_client.get(
+            reverse("session-csrf"),
+            secure=True,
+            HTTP_HOST="aliencommons.com",
+        )
+
+        response = csrf_client.post(
+            reverse("session-login"),
+            {
+                "email": self.email_address.email,
+                "password": "secret123",
+            },
+            format="json",
+            secure=True,
+            HTTP_HOST="aliencommons.com",
+            HTTP_ORIGIN="https://attacker.example",
+            HTTP_X_CSRFTOKEN=csrf_response.data["data"]["csrf_token"],
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.json()["code"], "csrf_failed")
+        self.assertFalse(UserSession.objects.exists())
+        self.assertNotIn("_auth_user_id", csrf_client.session)
 
     def test_login_rejects_unverified_email(self):
         self.email_address.is_verified = False

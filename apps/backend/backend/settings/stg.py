@@ -3,7 +3,7 @@ from .base import *
 DEBUG = False
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://api-stg.aliencommons.lazyalienserver.top",
+    "https://stg.aliencommons.com",
 ]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True

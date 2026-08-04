@@ -1,7 +1,10 @@
+from drf_spectacular.utils import extend_schema
 from drf_std_response import EnvelopeMixin
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+
+from core.openapi.serializers import ErrorEnvelopeSchemaSerializer
 
 from ..serializers import EmailVerifyRequestSerializer, EmailVerifyResponseSerializer
 from ..services.users import verify_email
@@ -11,6 +14,16 @@ class EmailViewSet(EnvelopeMixin, viewsets.ViewSet):
     """
     A viewset that collects endpoints which relate to email models.
     """
+    serializer_class = EmailVerifyRequestSerializer
+
+    @extend_schema(
+        request=EmailVerifyRequestSerializer,
+        responses={
+            200: EmailVerifyResponseSerializer,
+            400: ErrorEnvelopeSchemaSerializer,
+            403: ErrorEnvelopeSchemaSerializer,
+        },
+    )
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def verify_email(self, request):
         input_serializer = EmailVerifyRequestSerializer(data=request.data)

@@ -7,6 +7,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema_field
 from drf_std_response import ServiceError
 from PIL import Image
 from rest_framework import serializers
@@ -75,9 +76,11 @@ class ArticleReadSerializer(serializers.ModelSerializer):
             'publication_id',
         ]
 
+    @extend_schema_field(serializers.CharField())
     def get_status_display(self, obj):
         return obj.get_status_display()
 
+    @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_last_snapshot_id(self, obj):
         annotated_value = getattr(obj, "last_snapshot_id", None)
         if annotated_value is not None:
@@ -91,6 +94,7 @@ class ArticleReadSerializer(serializers.ModelSerializer):
         )
         return last_snapshot_id
 
+    @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_publication_id(self, obj):
         annotated_value = getattr(obj, "publication_id", None)
         if annotated_value is not None:
@@ -151,6 +155,12 @@ class ImageUploadSerializer(serializers.Serializer):
             "path": saved_path,
             "name": Path(saved_path).name,
         }
+
+
+class ImageUploadResponseSerializer(serializers.Serializer):
+    url = serializers.CharField(read_only=True)
+    path = serializers.CharField(read_only=True)
+    name = serializers.CharField(read_only=True)
 
 
 class ArticlePublicationVersionSerializer(serializers.ModelSerializer):
@@ -225,24 +235,29 @@ class ArticlePublicationSerializer(serializers.ModelSerializer):
     def _get_latest_version(self, obj):
         return obj.latest_version()
 
+    @extend_schema_field(ArticlePublicationVersionSerializer(allow_null=True))
     def get_latest_version(self, obj):
         latest_version = self._get_latest_version(obj)
         if latest_version is None:
             return None
         return ArticlePublicationVersionSerializer(latest_version).data
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_title(self, obj):
         latest_version = self._get_latest_version(obj)
         return latest_version.title if latest_version else None
 
+    @extend_schema_field(serializers.CharField(allow_null=True))
     def get_html(self, obj):
         latest_version = self._get_latest_version(obj)
         return latest_version.html if latest_version else None
 
+    @extend_schema_field(serializers.DateTimeField(allow_null=True))
     def get_publication_at(self, obj):
         latest_version = self._get_latest_version(obj)
         return latest_version.publication_at if latest_version else None
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_like_count(self, obj):
         annotated_value = getattr(obj, "like_count", None)
         if annotated_value is not None:
@@ -258,6 +273,7 @@ class ArticlePublicationSerializer(serializers.ModelSerializer):
             reaction_type=Reaction.ReactionType.LIKE,
         ).count()
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_dislike_count(self, obj):
         annotated_value = getattr(obj, "dislike_count", None)
         if annotated_value is not None:
@@ -273,6 +289,7 @@ class ArticlePublicationSerializer(serializers.ModelSerializer):
             reaction_type=Reaction.ReactionType.DISLIKE,
         ).count()
 
+    @extend_schema_field(serializers.IntegerField(allow_null=True))
     def get_my_reaction(self, obj):
         annotated_value = getattr(obj, "my_reaction", None)
         if annotated_value is not None:
@@ -293,6 +310,7 @@ class ArticlePublicationSerializer(serializers.ModelSerializer):
             .first()
         )
 
+    @extend_schema_field(serializers.IntegerField(min_value=0))
     def get_comment_count(self, obj):
         annotated_value = getattr(obj, "comment_count", None)
         if annotated_value is not None:
@@ -330,9 +348,11 @@ class ArticleSnapshotSerializer(serializers.ModelSerializer):
             'moderation_status_display',
         )
 
+    @extend_schema_field(serializers.CharField())
     def get_moderation_status_display(self, obj):
         return obj.get_moderation_status_display()
 
+    @extend_schema_field(serializers.UUIDField())
     def get_article_id(self, obj):
         obj: ArticleSnapshot
         return obj.article_id
@@ -365,6 +385,7 @@ class ArticleActionResponseSerializer(serializers.Serializer):
     article_id = serializers.UUIDField()
     article_snapshot_id = serializers.UUIDField(allow_null=True)
     event_id = serializers.UUIDField()
+    event_type_display = serializers.CharField(read_only=True)
 
     def to_representation(self, instance):
         """
