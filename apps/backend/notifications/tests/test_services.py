@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from comments.services import create_comment
 from core.tests.factories import (
     create_article,
@@ -88,3 +90,27 @@ class NotificationServiceTests(BaseTestCase):
         self.assertEqual(result, {"scanned": 1, "delivered": 1, "failed": 0})
         self.assertEqual(event.delivery_status, NotificationEvent.DeliveryStatus.DELIVERED)
         self.assertTrue(event.deliveries.filter(recipient=self.reader).exists())
+
+    def test_outbox_drain_continues_after_an_event_fails(self):
+        UserSubscription.objects.create(subscriber=self.reader, subscribed_to=self.author)
+        first_event = notify_subscribed_author_posted(
+            actor=self.author,
+            target=self.published.content_target,
+            content_kind="first-article-publication",
+        )
+        second_event = notify_subscribed_author_posted(
+            actor=self.author,
+            target=self.published.content_target,
+            content_kind="second-article-publication",
+        )
+
+        with patch("notifications.services.fan_out_event") as fan_out:
+            fan_out.side_effect = [RuntimeError("boom"), {"status": "delivered"}]
+
+            result = fan_out_pending_events()
+
+        self.assertEqual(result, {"scanned": 2, "delivered": 1, "failed": 1})
+        self.assertEqual(
+            [mock_call.kwargs["event_id"] for mock_call in fan_out.call_args_list],
+            [first_event.id, second_event.id],
+        )

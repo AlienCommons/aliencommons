@@ -130,7 +130,7 @@ def fan_out_pending_events(*, batch_size=100):
         try:
             fan_out_event(event_id=event_id)
             delivered += 1
-        except (NotificationEvent.DoesNotExist, ValueError, TypeError):
+        except Exception:  # noqa: BLE001 - Each event must fail independently.
             failed += 1
     return {"scanned": len(event_ids), "delivered": delivered, "failed": failed}
 
