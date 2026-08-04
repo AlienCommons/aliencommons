@@ -13,7 +13,7 @@ dependencies = [
   "djangorestframework==3.17.1",
   "drf-spectacular==0.30.0",
   "drf-std-response==0.1.0",
-  "environs==15.0.1",
+  "environs==15.1.0",
   "pillow==12.3.0",
   "psycopg[binary]==3.3.4",
   "requests==2.34.2",
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["ruff==0.16.0"]
+dev = ["ruff==0.16.1"]
 
 [tool.uv]
 add-bounds = "exact"
