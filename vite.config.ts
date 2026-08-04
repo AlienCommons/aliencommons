@@ -73,6 +73,7 @@ export default defineConfig({
       "apps/frontend/.nuxt",
       "apps/frontend/.output",
       "apps/frontend/app/api/generated",
+      "apps/backend/openapi",
       ".nuxt",
       ".output",
       ".dist",
