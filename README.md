@@ -2,7 +2,7 @@
   <img src=".github/assets/logo-lockup.png" width="720" alt="AlienCommons logo">
 </p>
 
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![Licensing](https://img.shields.io/badge/Licensing-see_COPYING.md-blue?style=flat-square)](COPYING.md)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=flat-square&logo=python)](https://python.org)
 [![Django](https://img.shields.io/badge/Django-6-092E20?style=flat-square&logo=django)](https://djangoproject.com)
 [![Vue](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org)
@@ -46,9 +46,8 @@ AlienCommons uses three environments:
 
 ## License
 
-AlienCommons source code and documentation are licensed under the
-[MIT License](LICENSE). The AlienCommons name, logo, wordmark, and other brand
-assets are excluded from the MIT License and are governed by the separate
-[AlienCommons Brand Assets License](branding/LICENSE).
-
-See [COPYING.md](COPYING.md) for the complete licensing scope.
+License terms are provided by the `LICENSE` file in each applicable package;
+see [COPYING.md](COPYING.md). Any use of AlienCommons branding materials, in
+any form or medium, is strictly prohibited without prior express written
+permission from Lazy Alien Server; see the
+[AlienCommons Branding Materials License](branding/LICENSE).

@@ -2,6 +2,7 @@
   "name": "alienmark-service",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "Internal HTTP service for AlienMark.",
   "type": "module",
   "main": "./dist/server.mjs",

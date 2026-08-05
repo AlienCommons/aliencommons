@@ -36,8 +36,9 @@ logo mark with an Alegreya Medium wordmark. It is used at the beginning of the
 repository READMEs. `social-preview.png` preserves the 1280 × 640 (2:1) layout
 for use as the repository social preview on GitHub.
 
-Brand assets are covered by the separate terms in [`LICENSE`](LICENSE), not by
-the repository's MIT License.
+Branding materials are covered by the separate terms in [`LICENSE`](LICENSE).
+Any use, in any form or medium, requires prior express written permission from
+Lazy Alien Server.
 
 ## Export rules
 

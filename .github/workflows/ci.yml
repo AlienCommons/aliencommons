@@ -13,7 +13,6 @@ on:
       - "apps/alienmark/**"
       - "apps/frontend/**"
       - "packages/alienmark/**"
-      - "LICENSE"
       - "COPYING.md"
       - "branding/LICENSE"
       - ".github/assets/**"
@@ -43,7 +42,6 @@ on:
       - "apps/alienmark/**"
       - "apps/frontend/**"
       - "packages/alienmark/**"
-      - "LICENSE"
       - "COPYING.md"
       - "branding/LICENSE"
       - ".github/assets/**"
@@ -111,7 +109,6 @@ jobs:
               - 'apps/alienmark/**'
               - 'apps/frontend/**'
               - 'packages/alienmark/**'
-              - 'LICENSE'
               - 'COPYING.md'
               - 'branding/LICENSE'
               - '.github/assets/**'

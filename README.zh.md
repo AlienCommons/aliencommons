@@ -2,7 +2,7 @@
   <img src=".github/assets/logo-lockup.png" width="720" alt="AlienCommons 标志">
 </p>
 
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+[![Licensing](https://img.shields.io/badge/Licensing-see_COPYING.md-blue?style=flat-square)](COPYING.md)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=flat-square&logo=python)](https://python.org)
 [![Django](https://img.shields.io/badge/Django-6-092E20?style=flat-square&logo=django)](https://djangoproject.com)
 [![Vue](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org)
@@ -46,8 +46,7 @@ AlienCommons 使用三个环境：
 
 ## 许可证
 
-AlienCommons 的源代码和文档采用 [MIT 许可证](LICENSE)。AlienCommons
-名称、徽标、文字标志及其他品牌素材不属于 MIT 许可证的授权范围，而是适用独立的
+各适用包的许可证条款以该包目录中的 `LICENSE` 文件为准，详见
+[COPYING.md](COPYING.md)。除非事先获得 Lazy Alien Server 的明确书面许可，
+严禁以任何形式或媒介使用 AlienCommons 品牌素材；详见
 [AlienCommons 品牌素材许可证](branding/LICENSE)。
-
-完整的许可证适用范围参见 [COPYING.md](COPYING.md)。

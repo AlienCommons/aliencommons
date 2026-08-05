@@ -11,40 +11,53 @@ const assert = (condition, message) => {
   }
 };
 
-const rootLicense = read("LICENSE");
-for (const path of [
-  "packages/alienmark/LICENSE",
-  "packages/drf-std-response/LICENSE",
-]) {
-  assert(read(path) === rootLicense, `${path} must match the root MIT license`);
-}
-
-for (const path of [
+const packageLicensePaths = [
   "apps/alienmark/LICENSE",
   "apps/backend/LICENSE",
   "apps/frontend/LICENSE",
+  "packages/alienmark/LICENSE",
+  "packages/drf-std-response/LICENSE",
+];
+const packageLicense = read(packageLicensePaths[0]);
+
+assert(
+  !existsSync(resolve(root, "LICENSE")),
+  "The repository root must not contain a LICENSE file"
+);
+assert(
+  packageLicense.startsWith("MIT License\n"),
+  `${packageLicensePaths[0]} must contain the MIT License`
+);
+for (const path of packageLicensePaths.slice(1)) {
+  assert(read(path) === packageLicense, `${path} must match the MIT License`);
+}
+
+for (const path of [
+  "apps/alienmark/package.json",
+  "apps/frontend/package.json",
+  "packages/alienmark/package.json",
 ]) {
+  const packageManifest = JSON.parse(read(path));
   assert(
-    !existsSync(resolve(root, path)),
-    `${path} duplicates the root license`
+    packageManifest.license === "MIT",
+    `${path} must declare the MIT license`
   );
 }
 
-const alienmarkPackage = JSON.parse(read("packages/alienmark/package.json"));
-assert(
-  alienmarkPackage.license === "MIT",
-  "packages/alienmark/package.json must declare the MIT license"
-);
-
-const drfProject = read("packages/drf-std-response/pyproject.toml");
-assert(
-  /^license = "MIT"$/mu.test(drfProject),
-  "packages/drf-std-response/pyproject.toml must declare the MIT license"
-);
-assert(
-  /^license-files = \["LICENSE"\]$/mu.test(drfProject),
-  "packages/drf-std-response/pyproject.toml must include its LICENSE file"
-);
+for (const path of [
+  "apps/backend/pyproject.toml",
+  "packages/drf-std-response/pyproject.toml",
+]) {
+  const project = read(path);
+  assert(
+    /^license = "MIT"$/mu.test(project),
+    `${path} must declare the MIT license`
+  );
+  assert(
+    /^license-files = \["LICENSE"\]$/mu.test(project),
+    `${path} must include its LICENSE file`
+  );
+}
 
 const packOutput = execFileSync(
   "npm",

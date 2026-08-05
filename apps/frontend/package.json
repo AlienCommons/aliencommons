@@ -2,6 +2,7 @@
   "name": "frontend",
   "type": "module",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "api:check": "openapi-typescript ../backend/openapi/v1.yaml -o app/api/generated/v1.d.ts --check",
     "api:generate": "openapi-typescript ../backend/openapi/v1.yaml -o app/api/generated/v1.d.ts",
