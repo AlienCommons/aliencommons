@@ -17,7 +17,7 @@ backend OpenAPI contract or frontend API layer changes.
 ## Runtime boundaries
 
 - Browser requests use `NUXT_PUBLIC_API_BASE` (default `/api`) and pass through
-  the same-origin Traefik route.
+  the same-origin Nuxt development proxy locally or Traefik after deployment.
 - SSR requests use `NUXT_API_INTERNAL_BASE` and call Django over the private
   Compose network.
 - The Nuxt plugin creates one client per app/request and only forwards the

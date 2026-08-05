@@ -21,8 +21,12 @@ pnpm api:generate
 Start the development server on `http://localhost:3000`:
 
 ```bash
-pnpm dev
+NUXT_API_INTERNAL_BASE=http://localhost:8000 pnpm dev
 ```
+
+Browser API requests use the same-origin `/api` path. During local development,
+Nuxt proxies that path to `NUXT_API_INTERNAL_BASE`; the Docker Compose setup
+configures this automatically.
 
 ## Production
 

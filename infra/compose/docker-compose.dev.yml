@@ -88,7 +88,7 @@ services:
     restart: unless-stopped
     environment:
       NUXT_API_INTERNAL_BASE: http://backend-api:8000
-      NUXT_PUBLIC_API_BASE: http://localhost:8000
+      NUXT_PUBLIC_API_BASE: /api
     working_dir: /code
     command: >
       sh -c "
