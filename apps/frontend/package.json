@@ -24,10 +24,10 @@
     "@nuxt/icon": "^2.3.1",
     "@pinia/nuxt": "^1.0.1",
     "alienmark": "workspace:*",
-    "nuxt": "^4.5.1",
+    "nuxt": "^4.5.2",
     "openapi-fetch": "^0.17.0",
     "pinia": "^4.0.2",
-    "vue": "^3.5.40",
+    "vue": "^3.5.41",
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
