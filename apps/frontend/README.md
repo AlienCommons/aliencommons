@@ -28,6 +28,10 @@ Browser API requests use the same-origin `/api` path. During local development,
 Nuxt proxies that path to `NUXT_API_INTERNAL_BASE`; the Docker Compose setup
 configures this automatically.
 
+The application supports English at `/` and Simplified Chinese at `/zh`.
+Translations live in `i18n/locales`; keep both locale files structurally in
+sync when adding interface copy.
+
 ## Production
 
 Build the application for production:

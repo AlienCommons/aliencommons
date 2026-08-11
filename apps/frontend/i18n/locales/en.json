@@ -1,0 +1,33 @@
+{
+  "accessibility": {
+    "skipToContent": "Skip to main content"
+  },
+  "error": {
+    "genericDescription": "Something prevented this page from loading. You can return home and try again.",
+    "genericTitle": "Something went wrong",
+    "notFoundDescription": "The page you were looking for does not exist or may have moved.",
+    "notFoundTitle": "Page not found",
+    "returnHome": "Return home"
+  },
+  "footer": {
+    "copyright": "© AlienCommons",
+    "tagline": "Built for the Technical Minecraft community."
+  },
+  "home": {
+    "description": "A shared place to publish knowledge, exchange ideas, and build lasting resources for the Technical Minecraft community.",
+    "eyebrow": "Technical Minecraft, together",
+    "metaTitle": "Technical Minecraft community",
+    "statusDescription": "The Nuxt application shell, localized routing, API foundation, and server-side rendering are ready for the first product features.",
+    "statusTitle": "The foundation is ready",
+    "title": "A home for knowledge built block by block."
+  },
+  "locale": {
+    "chinese": "Switch to Simplified Chinese",
+    "english": "Switch to English",
+    "label": "Language"
+  },
+  "navigation": {
+    "home": "Home",
+    "primary": "Primary navigation"
+  }
+}
