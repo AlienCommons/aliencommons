@@ -9,4 +9,5 @@ allowBuilds:
   unrs-resolver: true
 
 overrides:
+  js-yaml: 4.3.1
   typescript: npm:typescript-native-bridge@6.0.3-bridge.7.tsgo.7.0.2
