@@ -1,0 +1,33 @@
+{
+  "accessibility": {
+    "skipToContent": "跳到主要内容"
+  },
+  "error": {
+    "genericDescription": "页面加载时遇到了问题。你可以返回首页后重试。",
+    "genericTitle": "出现了一些问题",
+    "notFoundDescription": "你访问的页面不存在，或者已经移动。",
+    "notFoundTitle": "找不到页面",
+    "returnHome": "返回首页"
+  },
+  "footer": {
+    "copyright": "© AlienCommons",
+    "tagline": "为技术型 Minecraft 社区而建。"
+  },
+  "home": {
+    "description": "一个为技术型 Minecraft 社区发布知识、交流想法并共同沉淀长期资源的共享空间。",
+    "eyebrow": "一起探索技术型 Minecraft",
+    "metaTitle": "技术型 Minecraft 社区",
+    "statusDescription": "Nuxt 应用外壳、本地化路由、API 地基和服务端渲染已经就绪，可以开始构建第一个产品功能。",
+    "statusTitle": "项目地基已经就绪",
+    "title": "一砖一瓦，共建知识家园。"
+  },
+  "locale": {
+    "chinese": "切换到简体中文",
+    "english": "切换到英文",
+    "label": "语言"
+  },
+  "navigation": {
+    "home": "首页",
+    "primary": "主导航"
+  }
+}

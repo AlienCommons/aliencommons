@@ -88,6 +88,7 @@ services:
     restart: unless-stopped
     environment:
       NUXT_API_INTERNAL_BASE: http://backend-api:8000
+      NUXT_PUBLIC_I18N_BASE_URL: http://localhost:8080
       NUXT_PUBLIC_API_BASE: /api
     working_dir: /code
     command: >

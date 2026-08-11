@@ -13,7 +13,9 @@ export default defineNuxtPlugin(() => {
     readonly: true,
   });
 
-  const apiInternalBase = config.apiInternalBase.trim();
+  const apiInternalBase = import.meta.server
+    ? config.apiInternalBase.trim()
+    : "";
   const missingInternalBase = import.meta.server && !apiInternalBase;
   const baseUrl = import.meta.server
     ? apiInternalBase || MISSING_INTERNAL_API_URL

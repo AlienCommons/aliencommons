@@ -161,6 +161,7 @@ services:
     environment:
       NUXT_API_INTERNAL_BASE: http://backend-api:8000
       NUXT_PUBLIC_API_BASE: /api
+      NUXT_PUBLIC_I18N_BASE_URL: https://aliencommons.com
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend-production.rule=Host(`aliencommons.com`)"
