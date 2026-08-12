@@ -28,6 +28,48 @@
       "avatarAlt": "{username}'s avatar"
     }
   },
+  "articles": {
+    "card": {
+      "label": "Published guide"
+    },
+    "comments": "{count} comments",
+    "detail": {
+      "back": "Back to articles",
+      "label": "Published article",
+      "metaDescription": "Read {title} on AlienCommons."
+    },
+    "dislikes": "{count} dislikes",
+    "empty": {
+      "description": "The first community article has not been published yet.",
+      "title": "No articles yet"
+    },
+    "emptyBody": {
+      "description": "This publication does not currently contain a readable article body.",
+      "title": "Article body unavailable"
+    },
+    "error": {
+      "description": "We could not load published articles. Please try again.",
+      "retry": "Try again",
+      "title": "Articles are unavailable"
+    },
+    "eyebrow": "Knowledge base",
+    "likes": "{count} likes",
+    "list": {
+      "description": "Browse reviewed guides and lasting resources published by the Technical Minecraft community.",
+      "metaTitle": "Published articles",
+      "title": "Published articles"
+    },
+    "loading": "Loading published articles",
+    "pagination": {
+      "label": "Article pages",
+      "next": "Next",
+      "previous": "Previous",
+      "status": "Page {current} of {total}"
+    },
+    "read": "Read article",
+    "readNamed": "Read {title}",
+    "untitled": "Untitled article"
+  },
   "community": {
     "authorAvatar": "{username}'s avatar",
     "comments": "{count} comments",
@@ -77,14 +119,18 @@
   "home": {
     "description": "A shared place to publish knowledge, exchange ideas, and build lasting resources for the Technical Minecraft community.",
     "eyebrow": "Technical Minecraft, together",
+    "exploreArticles": "Browse articles",
     "exploreCommunity": "Explore the community",
-    "latestEyebrow": "Latest activity",
-    "latestTitle": "From the community",
+    "latestArticlesEyebrow": "Latest knowledge",
+    "latestArticlesTitle": "Recently published articles",
+    "latestPostsEyebrow": "Latest activity",
+    "latestPostsTitle": "From the community",
     "metaTitle": "Technical Minecraft community",
     "statusDescription": "The Nuxt application shell, localized routing, API foundation, and server-side rendering are ready for the first product features.",
     "statusTitle": "The foundation is ready",
     "title": "A home for knowledge built block by block.",
-    "viewAll": "View all posts"
+    "viewAllArticles": "View all articles",
+    "viewAllPosts": "View all posts"
   },
   "locale": {
     "chinese": "Switch to Simplified Chinese",
@@ -92,6 +138,7 @@
     "label": "Language"
   },
   "navigation": {
+    "articles": "Articles",
     "community": "Community",
     "home": "Home",
     "primary": "Primary navigation"

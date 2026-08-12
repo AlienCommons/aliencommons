@@ -5,8 +5,8 @@ import {
   getContentExcerpt,
   isUuid,
   parsePageNumber,
-  resolveCommunityPostBody,
-} from "../app/utils/community-posts";
+} from "../app/utils/content";
+import { resolveCommunityPostBody } from "../app/utils/community-posts";
 
 describe("community post utilities", () => {
   it.each([

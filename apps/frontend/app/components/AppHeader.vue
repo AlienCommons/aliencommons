@@ -53,6 +53,12 @@ async function handleSignOut(): Promise<void> {
         >
           {{ $t("navigation.community") }}
         </NuxtLink>
+        <NuxtLink
+          :to="localePath('articles')"
+          class="text-brand-700 hover:text-brand-900 hidden rounded-sm px-2 py-1 text-sm font-medium sm:inline-block"
+        >
+          {{ $t("navigation.articles") }}
+        </NuxtLink>
         <LocaleSwitcher />
         <UiLoadingSkeleton
           v-if="status === 'loading'"

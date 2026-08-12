@@ -378,7 +378,6 @@ class ArticlePublicationViewTests(BaseAPITestCase):
         unpublished_article.status = Article.ArticleStatus.UNPUBLISHED
         unpublished_article.save(update_fields=["status"])
 
-        self.authenticate(self.viewer)
         response = self.get_json(reverse("article_publication-list"))
 
         self.assert_success_response(
@@ -395,6 +394,33 @@ class ArticlePublicationViewTests(BaseAPITestCase):
         self.assertEqual(visible_result["latest_version"]["version"], 2)
         self.assertEqual(len(visible_result["versions"]), 2)
 
+    def test_publication_detail_is_public_and_sanitizes_html(self):
+        article = create_article(author=self.author, title="Safe publication")
+        publication = create_article_publication(
+            article,
+            html=(
+                '<h1>Safe</h1><script>alert("xss")</script>'
+                '<a href="javascript:alert(1)" onclick="alert(1)">link</a>'
+            ),
+        )
+
+        response = self.get_json(
+            reverse("article_publication-detail", args=[publication.id])
+        )
+
+        self.assert_success_response(
+            response,
+            status_code=status.HTTP_200_OK,
+            code="retrieved",
+        )
+        serialized = response.data["data"]
+        self.assertIn("<h1>Safe</h1>", serialized["html"])
+        self.assertNotIn("script", serialized["html"])
+        self.assertNotIn("javascript:", serialized["html"])
+        self.assertNotIn("onclick", serialized["html"])
+        self.assertEqual(serialized["html"], serialized["latest_version"]["html"])
+        self.assertEqual(serialized["html"], serialized["versions"][0]["html"])
+
     def test_publication_detail_returns_404_after_article_is_unpublished(self):
         article = create_article(author=self.author)
         publication = create_article_publication(article)
@@ -405,3 +431,14 @@ class ArticlePublicationViewTests(BaseAPITestCase):
         response = self.get_json(reverse("article_publication-detail", args=[publication.id]))
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_publication_endpoint_has_no_edit_operation(self):
+        article = create_article(author=self.author)
+        publication = create_article_publication(article)
+
+        response = self.patch_json(
+            reverse("article_publication-detail", args=[publication.id]),
+            {"title": "Not editable"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
