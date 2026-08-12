@@ -16,6 +16,7 @@ dependencies = [
   "drf-spectacular==0.30.0",
   "drf-std-response==0.1.0",
   "environs==15.1.0",
+  "nh3==0.3.6",
   "pillow==12.3.0",
   "psycopg[binary]==3.3.4",
   "requests==2.34.2",

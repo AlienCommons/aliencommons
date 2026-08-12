@@ -12,6 +12,7 @@ from drf_std_response import ServiceError
 from PIL import Image
 from rest_framework import serializers
 
+from core.utils.html import sanitize_published_html
 from core.validators import FileSizeValidator, FileTypeValidator
 
 from ..models import (
@@ -167,6 +168,11 @@ class ArticlePublicationVersionSerializer(serializers.ModelSerializer):
     """
     Serializer for immutable article publication versions.
     """
+    html = serializers.SerializerMethodField()
+
+    @extend_schema_field(serializers.CharField())
+    def get_html(self, obj):
+        return sanitize_published_html(obj.html)
 
     class Meta:
         model = ArticlePublicationVersion
@@ -250,7 +256,7 @@ class ArticlePublicationSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.CharField(allow_null=True))
     def get_html(self, obj):
         latest_version = self._get_latest_version(obj)
-        return latest_version.html if latest_version else None
+        return sanitize_published_html(latest_version.html) if latest_version else None
 
     @extend_schema_field(serializers.DateTimeField(allow_null=True))
     def get_publication_at(self, obj):

@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from core.utils.permissions import is_moderator
@@ -260,7 +260,7 @@ class ArticleViewSet(EnvelopeMixin, ModelViewSet):
 class ArticlePublicationViewSet(EnvelopeMixin, ReadOnlyModelViewSet):
     queryset = ArticlePublication.objects.select_related("article").prefetch_related("versions")
     serializer_class = ArticlePublicationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         from comments.querysets import with_article_publication_comment_count

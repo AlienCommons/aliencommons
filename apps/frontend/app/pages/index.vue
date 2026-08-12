@@ -8,11 +8,6 @@ useSeoMeta({
   ogTitle: () => t("home.metaTitle"),
   title: () => t("home.metaTitle"),
 });
-
-const { data, error, refresh, status } = await useCommunityPostList(1, {
-  key: "home-community-posts",
-});
-const latestPosts = computed(() => data.value?.results.slice(0, 3) ?? []);
 </script>
 
 <template>
@@ -36,61 +31,18 @@ const latestPosts = computed(() => data.value?.results.slice(0, 3) ?? []);
       <div class="mt-9 flex flex-wrap gap-3">
         <NuxtLink
           class="bg-brand-900 hover:bg-brand-700 rounded-xl px-5 py-3 font-semibold text-white transition-colors"
+          :to="localePath('articles')"
+        >
+          {{ $t("home.exploreArticles") }}
+        </NuxtLink>
+        <NuxtLink
+          class="border-brand-200 bg-white text-brand-900 hover:bg-brand-100 rounded-xl border px-5 py-3 font-semibold transition-colors"
           :to="localePath('community')"
         >
           {{ $t("home.exploreCommunity") }}
         </NuxtLink>
       </div>
     </section>
-
-    <section aria-labelledby="latest-community-posts" class="mt-20">
-      <div class="flex items-end justify-between gap-5">
-        <div>
-          <p
-            class="text-accent-600 text-sm font-bold tracking-widest uppercase"
-          >
-            {{ $t("home.latestEyebrow") }}
-          </p>
-          <h2
-            id="latest-community-posts"
-            class="text-brand-900 mt-2 text-3xl font-semibold tracking-tight"
-          >
-            {{ $t("home.latestTitle") }}
-          </h2>
-        </div>
-        <NuxtLink
-          class="text-accent-600 hover:text-brand-900 hidden rounded-sm text-sm font-semibold sm:block"
-          :to="localePath('community')"
-        >
-          {{ $t("home.viewAll") }}
-        </NuxtLink>
-      </div>
-
-      <UiLoadingSkeleton
-        v-if="status === 'pending'"
-        class="mt-8"
-        :label="$t('community.loading')"
-        :rows="6"
-      />
-      <UiEmptyState
-        v-else-if="error"
-        class="mt-8"
-        :description="$t('community.error.description')"
-        :title="$t('community.error.title')"
-      >
-        <template #action>
-          <UiBaseButton variant="secondary" @click="refresh()">
-            {{ $t("community.error.retry") }}
-          </UiBaseButton>
-        </template>
-      </UiEmptyState>
-      <UiEmptyState
-        v-else-if="latestPosts.length === 0"
-        class="mt-8"
-        :description="$t('community.empty.description')"
-        :title="$t('community.empty.title')"
-      />
-      <CommunityCommunityPostList v-else class="mt-8" :posts="latestPosts" />
-    </section>
+    <HomeLatestContent />
   </div>
 </template>
