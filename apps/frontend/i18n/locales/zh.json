@@ -21,6 +21,9 @@
       "submitting": "正在退出…",
       "unavailable": "退出登录失败，请重试。"
     },
+    "session": {
+      "loading": "正在加载账户"
+    },
     "userMenu": {
       "avatarAlt": "{username} 的头像"
     }

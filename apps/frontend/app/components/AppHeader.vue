@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const localePath = useLocalePath();
-const { isAuthenticated, logout, user } = useAuthSession();
+const { isAuthenticated, logout, status, user } = useAuthSession();
 const logoutError = shallowRef(false);
 const logoutPending = shallowRef(false);
 
@@ -48,8 +48,14 @@ async function handleSignOut(): Promise<void> {
           {{ $t("navigation.home") }}
         </NuxtLink>
         <LocaleSwitcher />
+        <UiLoadingSkeleton
+          v-if="status === 'loading'"
+          class="w-20"
+          :label="$t('auth.session.loading')"
+          :rows="1"
+        />
         <AuthUserMenu
-          v-if="isAuthenticated && user"
+          v-else-if="isAuthenticated && user"
           :pending="logoutPending"
           :user="user"
           @sign-out="handleSignOut"

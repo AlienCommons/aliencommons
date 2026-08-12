@@ -21,6 +21,9 @@
       "submitting": "Signing out…",
       "unavailable": "Sign-out failed. Please try again."
     },
+    "session": {
+      "loading": "Loading account"
+    },
     "userMenu": {
       "avatarAlt": "{username}'s avatar"
     }

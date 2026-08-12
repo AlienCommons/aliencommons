@@ -34,57 +34,41 @@ async function submit(): Promise<void> {
 
 <template>
   <form class="space-y-5" @submit.prevent="submit">
-    <div>
-      <label
-        class="text-brand-900 mb-2 block text-sm font-semibold"
-        for="email"
-      >
-        {{ $t("auth.login.email") }}
-      </label>
-      <input
-        id="email"
-        v-model.trim="form.email"
-        autocomplete="email"
-        class="border-brand-200 text-brand-900 placeholder:text-brand-500 focus:border-accent-600 w-full rounded-xl border bg-white px-4 py-3 shadow-sm transition-colors"
-        inputmode="email"
-        name="email"
-        required
-        type="email"
-      />
-    </div>
+    <UiFormField id="email" :label="$t('auth.login.email')" required>
+      <template #default="{ describedBy, id, invalid }">
+        <UiBaseInput
+          :id="id"
+          v-model="form.email"
+          :aria-describedby="describedBy"
+          autocomplete="email"
+          inputmode="email"
+          :invalid="invalid"
+          name="email"
+          required
+          type="email"
+        />
+      </template>
+    </UiFormField>
 
-    <div>
-      <label
-        class="text-brand-900 mb-2 block text-sm font-semibold"
-        for="password"
-      >
-        {{ $t("auth.login.password") }}
-      </label>
-      <input
-        id="password"
-        v-model="form.password"
-        autocomplete="current-password"
-        class="border-brand-200 text-brand-900 placeholder:text-brand-500 focus:border-accent-600 w-full rounded-xl border bg-white px-4 py-3 shadow-sm transition-colors"
-        name="password"
-        required
-        type="password"
-      />
-    </div>
+    <UiFormField id="password" :label="$t('auth.login.password')" required>
+      <template #default="{ describedBy, id, invalid }">
+        <UiBaseInput
+          :id="id"
+          v-model="form.password"
+          :aria-describedby="describedBy"
+          autocomplete="current-password"
+          :invalid="invalid"
+          name="password"
+          required
+          type="password"
+        />
+      </template>
+    </UiFormField>
 
-    <p
-      v-if="errorKey"
-      class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
-      role="alert"
-    >
-      {{ $t(errorKey) }}
-    </p>
+    <UiFormError v-if="errorKey" :message="$t(errorKey)" />
 
-    <button
-      :disabled="pending"
-      class="bg-brand-900 hover:bg-brand-700 w-full rounded-xl px-4 py-3 font-semibold text-white shadow-sm transition-colors disabled:cursor-wait disabled:opacity-60"
-      type="submit"
-    >
+    <UiBaseButton block :loading="pending" type="submit">
       {{ pending ? $t("auth.login.submitting") : $t("auth.login.submit") }}
-    </button>
+    </UiBaseButton>
   </form>
 </template>
