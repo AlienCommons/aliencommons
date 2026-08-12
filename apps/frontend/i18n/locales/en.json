@@ -28,6 +28,41 @@
       "avatarAlt": "{username}'s avatar"
     }
   },
+  "community": {
+    "authorAvatar": "{username}'s avatar",
+    "comments": "{count} comments",
+    "deletedUser": "Deleted user",
+    "detail": {
+      "back": "Back to community",
+      "metaTitle": "Post by {username}"
+    },
+    "dislikes": "{count} dislikes",
+    "empty": {
+      "description": "The first community post has not been published yet.",
+      "title": "No posts yet"
+    },
+    "error": {
+      "description": "We could not load community posts. Please try again.",
+      "retry": "Try again",
+      "title": "Community posts are unavailable"
+    },
+    "eyebrow": "Community",
+    "likes": "{count} likes",
+    "list": {
+      "description": "Ideas, discoveries, and conversations from the Technical Minecraft community.",
+      "metaTitle": "Community posts",
+      "title": "Community posts"
+    },
+    "loading": "Loading community posts",
+    "pagination": {
+      "label": "Community post pages",
+      "next": "Next",
+      "previous": "Previous",
+      "status": "Page {current} of {total}"
+    },
+    "readPost": "Read post",
+    "readPostBy": "Read post by {username}"
+  },
   "error": {
     "genericDescription": "Something prevented this page from loading. You can return home and try again.",
     "genericTitle": "Something went wrong",
@@ -42,10 +77,14 @@
   "home": {
     "description": "A shared place to publish knowledge, exchange ideas, and build lasting resources for the Technical Minecraft community.",
     "eyebrow": "Technical Minecraft, together",
+    "exploreCommunity": "Explore the community",
+    "latestEyebrow": "Latest activity",
+    "latestTitle": "From the community",
     "metaTitle": "Technical Minecraft community",
     "statusDescription": "The Nuxt application shell, localized routing, API foundation, and server-side rendering are ready for the first product features.",
     "statusTitle": "The foundation is ready",
-    "title": "A home for knowledge built block by block."
+    "title": "A home for knowledge built block by block.",
+    "viewAll": "View all posts"
   },
   "locale": {
     "chinese": "Switch to Simplified Chinese",
@@ -53,6 +92,7 @@
     "label": "Language"
   },
   "navigation": {
+    "community": "Community",
     "home": "Home",
     "primary": "Primary navigation"
   }

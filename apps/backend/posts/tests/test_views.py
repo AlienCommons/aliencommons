@@ -239,12 +239,27 @@ class CommunityPostViewTests(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(CommunityPost.objects.filter(id=post.id).exists())
 
-    def test_anonymous_users_cannot_access_posts(self):
+    def test_anonymous_users_can_read_posts(self):
+        post = create_community_post(author=self.author, body="Hello community")
+
+        list_response = self.get_json(reverse("community_post-list"))
+        detail_response = self.get_json(reverse("community_post-detail", args=[post.id]))
+
+        self.assert_success_response(
+            list_response,
+            status_code=status.HTTP_200_OK,
+            code="listed",
+        )
+        self.assert_success_response(
+            detail_response,
+            status_code=status.HTTP_200_OK,
+            code="retrieved",
+        )
+
+    def test_anonymous_users_cannot_write_posts(self):
         post = create_community_post(author=self.author, body="Hello community")
 
         responses = [
-            self.get_json(reverse("community_post-list")),
-            self.get_json(reverse("community_post-detail", args=[post.id])),
             self.post_json(reverse("community_post-list"), {"body": "Hello"}),
             self.patch_json(reverse("community_post-detail", args=[post.id]), {"body": "After"}),
             self.delete_json(reverse("community_post-detail", args=[post.id])),
