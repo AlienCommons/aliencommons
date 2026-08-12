@@ -214,6 +214,71 @@ class CommentViewTests(BaseAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(Comment.objects.filter(id=comment.id).exists())
 
+    def test_anonymous_users_can_read_comments(self):
+        comment = create_comment(self.author, self.published, body="Public comment")
+
+        list_response = self.get_json(
+            reverse("comment-list"),
+            {"article_publication": str(self.published.id)},
+        )
+        detail_response = self.get_json(reverse("comment-detail", args=[comment.id]))
+
+        self.assert_success_response(
+            list_response,
+            status_code=status.HTTP_200_OK,
+            code="listed",
+        )
+        self.assert_success_response(
+            detail_response,
+            status_code=status.HTTP_200_OK,
+            code="retrieved",
+        )
+
+    def test_anonymous_users_cannot_write_comments(self):
+        comment = create_comment(self.author, self.published, body="Public comment")
+
+        responses = [
+            self.post_json(
+                reverse("comment-list"),
+                {
+                    "article_publication": str(self.published.id),
+                    "body": "Anonymous comment",
+                },
+            ),
+            self.patch_json(
+                reverse("comment-detail", args=[comment.id]),
+                {"body": "Anonymous edit"},
+            ),
+            self.delete_json(reverse("comment-detail", args=[comment.id])),
+        ]
+
+        for response in responses:
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_anonymous_users_cannot_read_comments_on_deleted_posts(self):
+        post = create_community_post(author=self.author, body="Deleted post")
+        comment = Comment.objects.create(
+            author=self.author,
+            target=post.content_target,
+            body="Hidden comment",
+        )
+        post.is_deleted = True
+        post.save(update_fields=["is_deleted", "updated_at"])
+
+        list_response = self.get_json(reverse("comment-list"))
+        detail_response = self.get_json(reverse("comment-detail", args=[comment.id]))
+
+        self.assert_success_response(
+            list_response,
+            status_code=status.HTTP_200_OK,
+            code="listed",
+        )
+        self.assertNotIn(
+            str(comment.id),
+            {item["id"] for item in list_response.data["data"]["results"]},
+        )
+        self.assertEqual(detail_response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_list_filters_comments_by_article_publication(self):
         top_level = create_comment(self.author, self.published, body="Top level")
         reply = create_comment(self.other_user, self.published, reply_to=top_level, body="Reply")

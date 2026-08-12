@@ -20,8 +20,13 @@ class CommunityPostPermissionTests(BaseTestCase):
         request.user = user
         return request
 
-    def test_anonymous_users_do_not_have_general_permission(self):
+    def test_anonymous_users_have_safe_method_permission(self):
         request = self.request("get", AnonymousUser())
+
+        self.assertTrue(self.permission.has_permission(request, None))
+
+    def test_anonymous_users_do_not_have_unsafe_method_permission(self):
+        request = self.request("post", AnonymousUser())
 
         self.assertFalse(self.permission.has_permission(request, None))
 

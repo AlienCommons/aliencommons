@@ -3,6 +3,8 @@ from drf_std_response import EnvelopeMixin
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 
+from articles.models import Article
+
 from .models import Comment
 from .permissions import CommentPermission
 from .serializers import CommentReadSerializer, CommentWriteSerializer
@@ -48,6 +50,21 @@ class CommentViewSet(EnvelopeMixin, ModelViewSet):
                 ),
             )
         )
+        if self.request.user.is_anonymous:
+            queryset = queryset.filter(
+                Q(target__community_post__is_deleted=False)
+                | Q(
+                    target__article_publication__article__status=(
+                        Article.ArticleStatus.PUBLISHED
+                    )
+                )
+                | Q(parent__target__community_post__is_deleted=False)
+                | Q(
+                    parent__target__article_publication__article__status=(
+                        Article.ArticleStatus.PUBLISHED
+                    )
+                )
+            )
         article_publication_id = self.request.query_params.get("article_publication")
         community_post_id = self.request.query_params.get("community_post")
         parent_id = self.request.query_params.get("parent")
