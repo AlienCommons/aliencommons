@@ -32,6 +32,10 @@ The application supports English at `/` and Simplified Chinese at `/zh`.
 Translations live in `i18n/locales`; keep both locale files structurally in
 sync when adding interface copy.
 
+Authentication uses Django's same-origin session cookie. The Nuxt session
+plugin resolves the current user during SSR, while login and logout bootstrap
+and submit the required CSRF token in the browser.
+
 ## Production
 
 Build the application for production:

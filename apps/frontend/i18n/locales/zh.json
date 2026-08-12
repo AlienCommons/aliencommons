@@ -2,6 +2,29 @@
   "accessibility": {
     "skipToContent": "跳到主要内容"
   },
+  "auth": {
+    "login": {
+      "description": "使用你的 AlienCommons 账户登录以继续。",
+      "email": "电子邮箱",
+      "eyebrow": "欢迎回来",
+      "invalidCredentials": "邮箱或密码不正确。",
+      "metaTitle": "登录",
+      "navigation": "登录",
+      "password": "密码",
+      "submit": "登录",
+      "submitting": "正在登录…",
+      "title": "登录 AlienCommons",
+      "unavailable": "暂时无法登录，请稍后重试。"
+    },
+    "logout": {
+      "submit": "退出登录",
+      "submitting": "正在退出…",
+      "unavailable": "退出登录失败，请重试。"
+    },
+    "userMenu": {
+      "avatarAlt": "{username} 的头像"
+    }
+  },
   "error": {
     "genericDescription": "页面加载时遇到了问题。你可以返回首页后重试。",
     "genericTitle": "出现了一些问题",
