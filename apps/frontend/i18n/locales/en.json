@@ -2,6 +2,29 @@
   "accessibility": {
     "skipToContent": "Skip to main content"
   },
+  "auth": {
+    "login": {
+      "description": "Sign in with your AlienCommons account to continue.",
+      "email": "Email",
+      "eyebrow": "Welcome back",
+      "invalidCredentials": "The email or password is incorrect.",
+      "metaTitle": "Sign in",
+      "navigation": "Sign in",
+      "password": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "title": "Sign in to AlienCommons",
+      "unavailable": "Sign-in is temporarily unavailable. Please try again."
+    },
+    "logout": {
+      "submit": "Sign out",
+      "submitting": "Signing out…",
+      "unavailable": "Sign-out failed. Please try again."
+    },
+    "userMenu": {
+      "avatarAlt": "{username}'s avatar"
+    }
+  },
   "error": {
     "genericDescription": "Something prevented this page from loading. You can return home and try again.",
     "genericTitle": "Something went wrong",

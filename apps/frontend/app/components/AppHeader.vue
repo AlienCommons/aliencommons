@@ -1,5 +1,21 @@
 <script setup lang="ts">
 const localePath = useLocalePath();
+const { isAuthenticated, logout, user } = useAuthSession();
+const logoutError = shallowRef(false);
+const logoutPending = shallowRef(false);
+
+async function handleSignOut(): Promise<void> {
+  logoutError.value = false;
+  logoutPending.value = true;
+  try {
+    await logout();
+    await navigateTo(localePath("index"));
+  } catch {
+    logoutError.value = true;
+  } finally {
+    logoutPending.value = false;
+  }
+}
 </script>
 
 <template>
@@ -32,7 +48,23 @@ const localePath = useLocalePath();
           {{ $t("navigation.home") }}
         </NuxtLink>
         <LocaleSwitcher />
+        <AuthUserMenu
+          v-if="isAuthenticated && user"
+          :pending="logoutPending"
+          :user="user"
+          @sign-out="handleSignOut"
+        />
+        <NuxtLink
+          v-else
+          :to="localePath('login')"
+          class="bg-brand-900 hover:bg-brand-700 rounded-lg px-3 py-2 text-sm font-semibold text-white transition-colors"
+        >
+          {{ $t("auth.login.navigation") }}
+        </NuxtLink>
       </nav>
+      <p v-if="logoutError" class="sr-only" role="alert">
+        {{ $t("auth.logout.unavailable") }}
+      </p>
     </div>
   </header>
 </template>
