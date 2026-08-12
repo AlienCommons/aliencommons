@@ -101,8 +101,23 @@ Run the **smallest** check that covers your change. If a check cannot be run, sa
 | Any Node package (`apps/frontend`, `apps/alienmark`, `packages/alienmark`) | `pnpm run check` (full workspace) or `pnpm turbo run check --filter=<package>` (single package) |
 | Backend behavior | `uv run python manage.py test` from `apps/backend/`, or `make dev-backend-test` |
 | Backend lint | `uv run ruff check <apps> manage.py` from `apps/backend/` |
+| API contract | Regenerate `apps/backend/openapi/v1.yaml`, then run `pnpm --filter frontend api:generate` and commit both generated artifacts |
 | Docs site | Run both strict Zensical builds from `docs/<name>/` (default English config, then `zensical.zh.toml`) |
 | Unused-code audit (advisory) | `pnpm run knip` |
+
+### API contract synchronization
+
+When backend permissions, serializers, views, response schemas, or routes change the public API contract:
+
+```bash
+cd apps/backend
+DJANGO_SETTINGS_MODULE=backend.settings.test uv run --project ../.. --package aliencommons-backend python manage.py spectacular --file openapi/v1.yaml --validate --fail-on-warn
+cd ../..
+pnpm --filter frontend api:generate
+pnpm --filter frontend api:check
+```
+
+Commit both `apps/backend/openapi/v1.yaml` and `apps/frontend/app/api/generated/v1.d.ts` when they change. CI regenerates these files and fails if either committed artifact is stale.
 
 CI mirrors these in `.github/workflows/ci.yml`. If your change alters app names, settings modules, build commands, or verification steps, update the workflow too.
 

@@ -1046,10 +1046,6 @@ export interface components {
             readonly version: number;
             /** @description The title of the article publication version */
             readonly title: string;
-            /**
-             * Article in html
-             * @description The article in HTML format
-             */
             readonly html: string;
             /**
              * Published at

@@ -160,6 +160,7 @@ paths:
       - article_publications
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -231,6 +232,7 @@ paths:
       - article_publications
       security:
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
@@ -7367,8 +7369,6 @@ components:
         html:
           type: string
           readOnly: true
-          title: Article in html
-          description: The article in HTML format
         publication_at:
           type: string
           format: date-time
