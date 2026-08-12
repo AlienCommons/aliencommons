@@ -4,24 +4,25 @@ AlienMark is the Markdown parser and HTML renderer used by AlienCommons.
 
 It provides a small, intentional Markdown subset with a structured AST and a direct Markdown-to-HTML rendering API.
 
-## Installation
+## Workspace Usage
 
-AlienMark is published to GitHub Packages.
+AlienMark is an internal package in the AlienCommons pnpm workspace. It is not
+published to a package registry.
 
-```sh
-npm install @lazyalienserver/alienmark --registry=https://npm.pkg.github.com
-```
+Workspace consumers declare it with the workspace protocol:
 
-If you use npm with GitHub Packages regularly, configure the registry once:
-
-```sh
-npm config set @lazyalienserver:registry https://npm.pkg.github.com
+```json
+{
+  "dependencies": {
+    "alienmark": "workspace:*"
+  }
+}
 ```
 
 ## Usage
 
 ```ts
-import { parseMarkdown, renderMarkdown } from "@lazyalienserver/alienmark";
+import { parseMarkdown, renderMarkdown } from "alienmark";
 
 const html = renderMarkdown("# Hello");
 const ast = parseMarkdown("Use **bold** text.");

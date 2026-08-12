@@ -1,8 +1,8 @@
 # AlienMark Parser Agent Guide — `packages/alienmark/`
 
-TypeScript Markdown parser and HTML renderer. Published to GitHub Packages as `@lazyalienserver/alienmark`. Consumed by `apps/frontend` (workspace) and `apps/alienmark` (workspace, HTTP service). Syntax docs live in `docs/alienmark/`.
+TypeScript Markdown parser and HTML renderer. Internal to the pnpm workspace and consumed by `apps/frontend` and `apps/alienmark` (HTTP service). It is not published to a package registry. Syntax docs live in `docs/alienmark/`.
 
-This is a **published library**: the public API surface is a stability contract.
+This is a shared internal library: its exported API is a stability contract for workspace consumers.
 
 ## Public API
 
@@ -23,7 +23,7 @@ export type * from "./ast/nodes.js";  // DocumentNode, ParseOptions, and all AST
 - `parse` and `renderHtml` are the lower-level entrypoints, also exported.
 - All AST node types are re-exported from `src/ast/nodes.ts`.
 
-> Treat anything exported from `src/index.ts` as the public surface. Don't rename, reorder, or change signatures of these exports without bumping the package version and coordinating downstream (`apps/frontend`, `apps/alienmark`, and external consumers via GitHub Packages).
+> Treat anything exported from `src/index.ts` as the public surface. Don't rename, reorder, or change signatures of these exports without bumping the package version and coordinating downstream (`apps/frontend` and `apps/alienmark`).
 
 ## Supported Markdown subset
 
@@ -77,7 +77,7 @@ test/
 
 ## Rules
 
-- **Public API is stable.** Bump `version` in `package.json` (currently `0.1.x`) on any breaking change; coordinate with `apps/frontend` and `apps/alienmark` and external consumers.
+- **Public API is stable.** Bump `version` in `package.json` (currently `0.1.x`) on any breaking change and coordinate with `apps/frontend` and `apps/alienmark`.
 - **No `any`.** `exactOptionalPropertyTypes` is on — model optional fields precisely; don't smuggle `undefined` into required positions.
 - **`.js` import specifiers are mandatory** (NodeNext + `verbatimModuleSyntax`). Type-only imports must use `import type`.
 - **Always update both `test/` and `docs/alienmark/docs/syntax.{en,zh}.md`** when supported syntax changes (see [`docs/AGENTS.md`](../../docs/AGENTS.md) on keeping EN/ZH in sync).
@@ -92,4 +92,4 @@ pnpm turbo run check --filter=alienmark      # vp check (lint + format + type-aw
 pnpm turbo run typecheck --filter=alienmark  # tsc --noEmit
 ```
 
-CI publishes this package from the `main` branch via `.github/workflows/alienmark-package-publish.yml`. Don't change the publish workflow's package name, registry, or version source without coordinating.
+This package is private to the workspace. Keep `private: true` in `package.json` and do not add registry publishing automation.
