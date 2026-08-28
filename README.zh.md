@@ -41,8 +41,10 @@ AlienCommons 是面向技术向 Minecraft 玩家构建的社区平台，为玩�
 AlienCommons 使用三个环境：
 
 - **`dev`** — 本地开发，使用 Docker Compose
-- **`stg`** — 预发布环境，托管于 AWS，尽可能与生产环境一致
-- **`pro`** — 生产环境，托管于 AWS，使用 Cloudflare DNS 解析 `aliencommons.com`
+- **`stg`** — 预发布环境，托管在 `Workloads/Stg` 下的独立 AWS Member Account 中，尽可能与生产环境一致
+- **`pro`** — 生产环境，托管在 `Workloads/Pro` 下的独立 AWS Member Account 中，使用 Cloudflare DNS 解析 `aliencommons.com`
+
+AWS Organizations 的 Management Account 仅用于组织、身份和账单管理；应用工作负载只部署到对应环境的 Member Account。
 
 ## 许可证
 
