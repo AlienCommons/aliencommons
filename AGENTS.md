@@ -57,8 +57,10 @@ If an area has no dedicated guide, follow the conventions already present in nea
 Three environments. Do not encode environment-specific values in source.
 
 - **`dev`** — local, via Docker Compose (`make dev-up`).
-- **`stg`** — staging on AWS, mirrors production.
-- **`pro`** — production on AWS. DNS for `aliencommons.com` is in Cloudflare.
+- **`stg`** — staging in the dedicated AWS member account under `Workloads/Stg`; mirrors production.
+- **`pro`** — production in the dedicated AWS member account under `Workloads/Pro`. DNS for `aliencommons.com` is in Cloudflare.
+
+The AWS Organizations management account is governance-only: do not deploy application workloads, buckets, registries, or CI roles there. Keep account IDs, root email addresses, role ARNs, and concrete bucket names out of the repository; provide them through environment-scoped deployment configuration.
 
 ## Common commands
 
