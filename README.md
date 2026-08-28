@@ -41,8 +41,12 @@ Please note that some materials may be not fully up-to-date in this stage.
 AlienCommons uses three environments:
 
 - **`dev`** — local development with Docker Compose
-- **`stg`** — staging, hosted on AWS, mirrors production as closely as practical
-- **`pro`** — production, hosted on AWS with Cloudflare DNS for `aliencommons.com`
+- **`stg`** — staging, hosted in its own AWS member account under `Workloads/Stg` and mirrors production as closely as practical
+- **`pro`** — production, hosted in its own AWS member account under `Workloads/Pro` with Cloudflare DNS for `aliencommons.com`
+
+The AWS Organizations management account is reserved for organization, identity,
+and billing administration; application workloads are deployed only to the
+environment member accounts.
 
 ## License
 
