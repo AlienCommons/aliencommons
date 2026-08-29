@@ -19,6 +19,16 @@ variable "github_repository" {
   type        = string
 }
 
+variable "github_organization_id" {
+  description = "Immutable GitHub organization ID encoded in OIDC subjects."
+  type        = string
+}
+
+variable "github_repository_id" {
+  description = "Immutable GitHub repository ID encoded in OIDC subjects."
+  type        = string
+}
+
 variable "github_environment" {
   description = "GitHub Environment encoded in the OIDC subject claim."
   type        = string

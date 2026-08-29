@@ -43,6 +43,26 @@ variable "github_repository" {
   }
 }
 
+variable "github_organization_id" {
+  description = "Immutable GitHub organization ID encoded in OIDC subjects."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[0-9]+$", var.github_organization_id))
+    error_message = "github_organization_id must contain only digits."
+  }
+}
+
+variable "github_repository_id" {
+  description = "Immutable GitHub repository ID encoded in OIDC subjects."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[0-9]+$", var.github_repository_id))
+    error_message = "github_repository_id must contain only digits."
+  }
+}
+
 variable "availability_zone" {
   description = "Optional fixed Availability Zone; defaults to the first available zone."
   type        = string

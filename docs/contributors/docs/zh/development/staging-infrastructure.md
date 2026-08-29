@@ -36,7 +36,9 @@ apply 前检查完整 plan，并确认：
 
 本地 apply 成功后，把两个 role ARN outputs 直接写入 GitHub `stg` Environment 中对应的
 infrastructure 和 deployment workflow variables。Account、region、state bucket 和 Cloudflare
-Zone ID 保持为 Environment variables；Cloudflare token 保持为 Environment secret。
+Zone ID 保持为 Environment variables；Cloudflare token 保持为 Environment secret。同时把 GitHub
+Organization 和 Repository 的数字 ID 保存为 Environment variables；IAM 使用它们绑定 GitHub 的
+不可变 OIDC subject。
 
 `Stg Infrastructure` workflow 只能手动触发。先运行 `plan` 并完成检查；只有针对同一份已检查
 revision 才运行 `apply`，并输入要求的确认文字。Workflow 会串行执行预发布基础设施操作，也不会

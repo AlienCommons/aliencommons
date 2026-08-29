@@ -42,7 +42,9 @@ first apply overwrite an unknown record.
 After the local apply succeeds, copy the two role ARN outputs directly into the
 GitHub `stg` Environment variables expected by the infrastructure and deployment
 workflows. Keep the account, region, state bucket, and Cloudflare Zone ID as
-environment variables, and the Cloudflare token as an environment secret.
+environment variables, and the Cloudflare token as an environment secret. Also
+store the GitHub organization and repository numeric IDs as environment
+variables; IAM uses them to bind trust to GitHub's immutable OIDC subject.
 
 The `Stg Infrastructure` workflow is manual-only. Run `plan` first and review it.
 Use `apply` only for that reviewed revision and enter the required confirmation

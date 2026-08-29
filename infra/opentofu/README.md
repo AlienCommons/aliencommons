@@ -85,7 +85,9 @@ At minimum, configure:
 - `AWS_STG_TOFU_ROLE_TO_ASSUME` from `infrastructure_role_arn`;
 - `AWS_STG_ROLE_TO_ASSUME` from `deploy_role_arn`;
 - `AWS_STG_ACCOUNT_ID` and `AWS_STG_OPENTOFU_STATE_BUCKET` from the existing
-  bootstrap configuration.
+  bootstrap configuration;
+- `GH_ORGANIZATION_ID` and `GH_REPOSITORY_ID` from the GitHub API. The
+  IAM trust uses GitHub's immutable OIDC subject rather than renameable names.
 
 The workflow in `.github/workflows/stg-infrastructure.yml` is manual-only. Its
 apply path requires the exact confirmation text `apply-stg`; there is no push or

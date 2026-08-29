@@ -77,15 +77,17 @@ resource "cloudflare_dns_record" "application_origin" {
 module "github_oidc" {
   source = "../../modules/github-oidc"
 
-  name_prefix           = local.name_prefix
-  aws_account_id        = var.aws_account_id
-  aws_region            = var.aws_region
-  github_repository     = var.github_repository
-  github_environment    = local.environment
-  state_bucket_name     = var.state_bucket_name
-  ecr_repository_arns   = toset(values(module.registry.repository_arns))
-  docs_bucket_arn       = module.storage_cdn.docs_bucket_arn
-  deployment_bucket_arn = module.storage_cdn.deployment_bucket_arn
+  name_prefix            = local.name_prefix
+  aws_account_id         = var.aws_account_id
+  aws_region             = var.aws_region
+  github_repository      = var.github_repository
+  github_organization_id = var.github_organization_id
+  github_repository_id   = var.github_repository_id
+  github_environment     = local.environment
+  state_bucket_name      = var.state_bucket_name
+  ecr_repository_arns    = toset(values(module.registry.repository_arns))
+  docs_bucket_arn        = module.storage_cdn.docs_bucket_arn
+  deployment_bucket_arn  = module.storage_cdn.deployment_bucket_arn
   cloudfront_distribution_arns = toset([
     module.storage_cdn.docs_distribution_arn,
     module.storage_cdn.media_distribution_arn,

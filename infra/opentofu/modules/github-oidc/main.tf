@@ -1,3 +1,19 @@
+locals {
+  github_repository_parts = split("/", var.github_repository)
+  github_oidc_subject = join("", [
+    "repo:",
+    local.github_repository_parts[0],
+    "@",
+    var.github_organization_id,
+    "/",
+    local.github_repository_parts[1],
+    "@",
+    var.github_repository_id,
+    ":environment:",
+    var.github_environment,
+  ])
+}
+
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -24,7 +40,7 @@ data "aws_iam_policy_document" "github_assume_role" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repository}:environment:${var.github_environment}"]
+      values   = [local.github_oidc_subject]
     }
   }
 }

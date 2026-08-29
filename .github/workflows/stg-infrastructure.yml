@@ -42,6 +42,8 @@ jobs:
       TF_VAR_aws_region: ${{ vars.AWS_STG_REGION }}
       TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
       TF_VAR_state_bucket_name: ${{ vars.AWS_STG_OPENTOFU_STATE_BUCKET }}
+      TF_VAR_github_organization_id: ${{ vars.GH_ORGANIZATION_ID }}
+      TF_VAR_github_repository_id: ${{ vars.GH_REPOSITORY_ID }}
 
     steps:
       - name: Validate apply confirmation
@@ -63,7 +65,7 @@ jobs:
         shell: bash
         env:
           EXPECTED_OIDC_AUDIENCE: sts.amazonaws.com
-          EXPECTED_OIDC_SUBJECT: repo:${{ github.repository }}:environment:stg
+          EXPECTED_OIDC_SUBJECT: repo:${{ github.repository_owner }}@${{ vars.GH_ORGANIZATION_ID }}/${{ github.event.repository.name }}@${{ vars.GH_REPOSITORY_ID }}:environment:stg
         run: |
           oidc_response="$(
             curl --fail --silent --show-error \
