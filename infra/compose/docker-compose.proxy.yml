@@ -9,18 +9,13 @@ services:
       DOCKER_API_VERSION: "1.44"
     command:
       - "--configFile=/etc/traefik/traefik.yml"
-      - "--certificatesresolvers.le.acme.email=${TRAEFIK_ACME_EMAIL:?Set TRAEFIK_ACME_EMAIL in env/.env.proxy}"
-      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.le.acme.httpchallenge=true"
-      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
     ports:
-      - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ../traefik/dynamic:/etc/traefik/dynamic:ro
-      - letsencrypt:/letsencrypt
+      - /srv/aliencommons/origin-certs:/etc/traefik/certs:ro
     networks:
       - proxy
     healthcheck:
@@ -35,6 +30,3 @@ networks:
   proxy:
     external: true
     name: aliencommons-proxy
-
-volumes:
-  letsencrypt:

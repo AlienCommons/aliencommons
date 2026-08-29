@@ -7,7 +7,7 @@ COMPOSE_PROXY = -f infra/compose/docker-compose.proxy.yml
 DEV_COMPOSE = docker compose --env-file env/.env.dev $(COMPOSE_BASE) $(COMPOSE_DEV)
 STG_COMPOSE = docker compose --env-file env/.env.stg $(COMPOSE_BASE) $(COMPOSE_STG)
 PRO_COMPOSE = docker compose --env-file env/.env.pro $(COMPOSE_BASE) $(COMPOSE_PRO)
-PROXY_COMPOSE = docker compose --env-file env/.env.proxy $(COMPOSE_PROXY)
+PROXY_COMPOSE = docker compose $(COMPOSE_PROXY)
 
 DEV_MANAGE = $(DEV_COMPOSE) run --rm backend-api python manage.py
 DEV_MANAGE_NO_DEPS = $(DEV_COMPOSE) run --rm --no-deps backend-api python manage.py
@@ -83,7 +83,7 @@ stg-up: proxy-network
 	$(STG_COMPOSE) up -d $(DB)
 	$(STG_COMPOSE) run --rm backend-init
 	$(STG_COMPOSE) up -d $(OBSERVE)
-	$(STG_COMPOSE) up -d --build $(APP)
+	$(STG_COMPOSE) up -d $(APP)
 
 stg-down:
 	$(STG_COMPOSE) down

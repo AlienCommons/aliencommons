@@ -1,26 +1,50 @@
 # Traefik
 
-Traefik terminates HTTPS on each staging or production deployment host. Staging
-and production live in separate AWS member accounts and must not share a host,
-proxy container, certificate volume, or Docker network. Within each host, the
-environment's public services and Traefik join the host-local external
+Cloudflare is the public reverse proxy and terminates visitor TLS. Traefik
+remains the host-local reverse proxy for Docker discovery, host and path routing,
+and middleware. Cloudflare connects to Traefik over HTTPS using a Cloudflare
+Origin CA certificate; Traefik does not run ACME or request Let's Encrypt
+certificates.
+
+Staging and production live in separate AWS member accounts and must not share a
+host, proxy container, certificate files, or Docker network. Within each host,
+the environment's public services and Traefik join the host-local external
 `aliencommons-proxy` Docker network; application-internal traffic remains on the
 Compose project's default network.
 
-## First-time setup
+## Install the Origin CA certificate
 
-1. Copy `env/.env.proxy.example` to `env/.env.proxy` and set an email address
-   monitored by the operators.
-2. Point the public DNS records at the proxy host and allow inbound TCP ports
-   80 and 443. Port 80 must remain reachable for the Let's Encrypt HTTP-01
-   challenge and redirects all other requests to HTTPS.
-3. Run `make proxy-check`, then `make proxy-up` on that environment's host
-   before starting its staging or production Compose project.
+Store the Origin CA certificate and private key as separate SSM `SecureString`
+parameters in the workload account. Do not commit either value or pass it through
+OpenTofu. On the deployment host, use its instance role to retrieve and validate
+the pair:
 
-Certificates are stored in a host-local `aliencommons-proxy_letsencrypt` Docker
-volume, which survives container recreation and `make proxy-down`. Back up each
-environment's volume with the rest of that host's persistent deployment data;
-never copy the volume between the staging and production accounts.
+```bash
+sudo infra/deploy/stg/prepare-origin-certificates.sh \
+  <certificate-parameter-name> \
+  <private-key-parameter-name>
+```
+
+The script writes `/srv/aliencommons/origin-certs/tls.crt` with mode `0644` and
+`tls.key` with mode `0600`. The directory is mounted read-only at
+`/etc/traefik/certs`; the file provider loads the pair from
+`infra/traefik/dynamic/tls.yml`. Re-run the script and restart Traefik when the
+Origin CA certificate is rotated.
+
+## Network and first-time setup
+
+1. Confirm Cloudflare SSL/TLS mode is `Full (strict)` and every application DNS
+   record is proxied.
+2. Allow inbound TCP 443 only from Cloudflare's published origin-facing IP
+   ranges. Do not expose ports 22 or 80; administer the host through AWS Systems
+   Manager Session Manager.
+3. Install the Origin CA certificate before starting Traefik.
+4. Run `make proxy-check`, then `make proxy-up` before starting the staging or
+   production Compose project.
+
+A Cloudflare Origin CA certificate is intentionally not trusted by ordinary
+browsers. Direct origin access must be blocked at the AWS security group; public
+requests must pass through Cloudflare.
 
 The dashboard is disabled. Traefik emits JSON application and access logs to
 stdout, and its Docker socket mount is read-only. Shared TLS and response-header

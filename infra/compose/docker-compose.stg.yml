@@ -17,9 +17,7 @@ services:
 
   backend-init:
     <<: *stack-env
-    build:
-      context: ../..
-      dockerfile: apps/backend/Dockerfile
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
     working_dir: /code/apps/backend
     command: >
       sh -c "python manage.py migrate && python manage.py init_tasks"
@@ -29,9 +27,7 @@ services:
 
   backend-api:
     <<: *stack-env
-    build:
-      context: ../..
-      dockerfile: apps/backend/Dockerfile
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
     working_dir: /code/apps/backend
     restart: unless-stopped
     environment:
@@ -42,17 +38,15 @@ services:
       - alienmark
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend-api-stg.rule=Host(`api-stg.aliencommons.com`)"
+      - "traefik.http.routers.backend-api-stg.rule=Host(`api.stg.aliencommons.com`)"
       - "traefik.http.routers.backend-api-stg.entrypoints=websecure"
       - "traefik.http.routers.backend-api-stg.middlewares=web-secure@file"
       - "traefik.http.routers.backend-api-stg.service=backend-api-stg"
-      - "traefik.http.routers.backend-api-stg.tls.certresolver=le"
       - "traefik.http.routers.backend-api-same-origin-stg.rule=Host(`stg.aliencommons.com`) && PathPrefix(`/api/`)"
       - "traefik.http.routers.backend-api-same-origin-stg.entrypoints=websecure"
       - "traefik.http.routers.backend-api-same-origin-stg.middlewares=backend-api-strip-prefix-stg,web-secure@file"
       - "traefik.http.routers.backend-api-same-origin-stg.priority=100"
       - "traefik.http.routers.backend-api-same-origin-stg.service=backend-api-stg"
-      - "traefik.http.routers.backend-api-same-origin-stg.tls.certresolver=le"
       - "traefik.http.middlewares.backend-api-strip-prefix-stg.stripprefix.prefixes=/api"
       - "traefik.http.services.backend-api-stg.loadbalancer.server.port=8000"
     networks:
@@ -63,9 +57,7 @@ services:
 
   backend-task-scheduler:
     <<: *stack-env
-    build:
-      context: ../..
-      dockerfile: apps/backend/Dockerfile
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
     working_dir: /code/apps/backend
     restart: unless-stopped
     command: >
@@ -73,9 +65,7 @@ services:
 
   backend-task-worker:
     <<: *stack-env
-    build:
-      context: ../..
-      dockerfile: apps/backend/Dockerfile
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
     working_dir: /code/apps/backend
     restart: unless-stopped
     command: >
@@ -145,10 +135,9 @@ services:
       GF_PLUGINS_PREINSTALL_DISABLED: "true"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana-stg.rule=Host(`grafana-stg.aliencommons.com`)"
+      - "traefik.http.routers.grafana-stg.rule=Host(`grafana.stg.aliencommons.com`)"
       - "traefik.http.routers.grafana-stg.entrypoints=websecure"
       - "traefik.http.routers.grafana-stg.middlewares=web-secure@file"
-      - "traefik.http.routers.grafana-stg.tls.certresolver=le"
       - "traefik.http.services.grafana-stg.loadbalancer.server.port=3000"
     networks:
       - default
@@ -162,9 +151,7 @@ services:
         restart: true
 
   frontend:
-    build:
-      context: ../..
-      dockerfile: apps/frontend/Dockerfile
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE in env/.env.stg}
     restart: unless-stopped
     environment:
       NUXT_API_INTERNAL_BASE: http://backend-api:8000
@@ -175,16 +162,13 @@ services:
       - "traefik.http.routers.frontend-stg.rule=Host(`stg.aliencommons.com`)"
       - "traefik.http.routers.frontend-stg.entrypoints=websecure"
       - "traefik.http.routers.frontend-stg.middlewares=web-secure@file"
-      - "traefik.http.routers.frontend-stg.tls.certresolver=le"
       - "traefik.http.services.frontend-stg.loadbalancer.server.port=3000"
     networks:
       - default
       - proxy
 
   alienmark:
-    build:
-      context: ../..
-      dockerfile: apps/alienmark/Dockerfile
+    image: ${ALIENMARK_IMAGE:?Set ALIENMARK_IMAGE in env/.env.stg}
     restart: unless-stopped
     environment:
       HOST: 0.0.0.0
@@ -194,10 +178,9 @@ services:
     image: nginx:alpine
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.static-stg.rule=Host(`api-stg.aliencommons.com`) && PathPrefix(`/static`)"
+      - "traefik.http.routers.static-stg.rule=Host(`api.stg.aliencommons.com`) && PathPrefix(`/static`)"
       - "traefik.http.routers.static-stg.entrypoints=websecure"
       - "traefik.http.routers.static-stg.middlewares=web-secure@file"
-      - "traefik.http.routers.static-stg.tls.certresolver=le"
       - "traefik.http.services.static-stg.loadbalancer.server.port=80"
     networks:
       - proxy

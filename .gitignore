@@ -78,7 +78,6 @@ docs/*/site/
 
 # Environment files
 env/.env.pro
-env/.env.proxy
 env/.env.stg
 
 # Observability runtime data

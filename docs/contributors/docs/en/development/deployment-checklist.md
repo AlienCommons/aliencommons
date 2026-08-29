@@ -30,7 +30,17 @@ cp env/.env.pro.example env/.env.pro  # production host only
 Replace every placeholder before starting the stack. The AWS media bucket and
 custom domain must belong to the same member account as the deployment. Hosted
 containers obtain AWS credentials from an IAM workload role; do not add access
-keys to these files.
+keys to these files. Staging uses immutable ECR image references for
+`BACKEND_IMAGE`, `FRONTEND_IMAGE`, and `ALIENMARK_IMAGE`; the deployment workflow
+must populate digest-pinned references before Compose is started.
+
+The staging public hostnames are:
+
+- `stg.aliencommons.com` for Nuxt and the same-origin `/api` route;
+- `api.stg.aliencommons.com` for direct API and static-file access;
+- `grafana.stg.aliencommons.com` for Grafana;
+- `media.stg.aliencommons.com` for user media;
+- `docs.stg.aliencommons.com` for the deployed documentation.
 
 The AlienMark documentation deployment is disabled until the new staging S3
 destination and GitHub OIDC role exist. To enable it, configure the `stg` GitHub
@@ -42,20 +52,28 @@ documentation destination.
 
 ## Configure Traefik
 
-Before starting Traefik on a staging or production host, create its local
-environment file from the tracked example:
+Cloudflare terminates visitor TLS and proxies application traffic to Traefik.
+Set the zone to `Full (strict)`, keep application records proxied, and install a
+Cloudflare Origin CA certificate covering the environment's hostnames. Traefik
+loads that static certificate and does not run ACME or request a Let's Encrypt
+certificate.
+
+Store the Origin CA certificate and private key as separate SSM `SecureString`
+parameters in the target workload account. Do not commit their values, put them
+in a normal environment file, or pass them through OpenTofu. Install the pair on
+the host before starting Traefik:
 
 ```bash
-cp env/.env.proxy.example env/.env.proxy
+sudo infra/deploy/stg/prepare-origin-certificates.sh \
+  <certificate-parameter-name> \
+  <private-key-parameter-name>
 ```
 
-Open `env/.env.proxy` and replace `TRAEFIK_ACME_EMAIL` with a real operations
-email address. The file is intentionally ignored by Git and must be configured
-separately on the staging and production proxy hosts.
-
-Confirm that the public DNS records point to the proxy host and that inbound TCP
-ports 80 and 443 are reachable. Port 80 is required by the Let's Encrypt HTTP-01
-challenge.
+The script validates the certificate and key before atomically installing them
+under `/srv/aliencommons/origin-certs`. Traefik mounts that directory read-only.
+The EC2 security group must allow inbound TCP 443 only from Cloudflare's
+published IP ranges. Do not expose ports 22 or 80; use AWS Systems Manager
+Session Manager for host access.
 
 Validate and start the proxy before bringing up staging or production:
 
@@ -64,6 +82,7 @@ make proxy-check
 make proxy-up
 ```
 
-Traefik stores issued certificates in a host-local
-`aliencommons-proxy_letsencrypt` Docker volume. Include the relevant volume in
-each host's persistent-data backup plan, and do not copy it between accounts.
+Cloudflare Origin CA certificates are not trusted by ordinary browsers. This is
+expected: direct origin access is blocked, and public requests must pass through
+Cloudflare. Re-run the installation script and restart Traefik when the Origin
+CA certificate is rotated.
