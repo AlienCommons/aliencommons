@@ -59,6 +59,37 @@ jobs:
           tofu_version_file: .opentofu-version
           tofu_wrapper: false
 
+      - name: Verify GitHub OIDC claims
+        shell: bash
+        env:
+          EXPECTED_OIDC_AUDIENCE: sts.amazonaws.com
+          EXPECTED_OIDC_SUBJECT: repo:${{ github.repository }}:environment:stg
+        run: |
+          oidc_response="$(
+            curl --fail --silent --show-error \
+              --header "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+              "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${EXPECTED_OIDC_AUDIENCE}"
+          )"
+          OIDC_TOKEN="$(jq --exit-status --raw-output '.value' <<<"${oidc_response}")"
+          export OIDC_TOKEN
+
+          node <<'NODE'
+          const claims = JSON.parse(
+            Buffer.from(process.env.OIDC_TOKEN.split('.')[1], 'base64url').toString(),
+          )
+
+          console.log(`OIDC audience: ${claims.aud}`)
+          console.log(`OIDC subject: ${claims.sub}`)
+
+          if (claims.aud !== process.env.EXPECTED_OIDC_AUDIENCE) {
+            throw new Error('Unexpected GitHub OIDC audience')
+          }
+
+          if (claims.sub !== process.env.EXPECTED_OIDC_SUBJECT) {
+            throw new Error('Unexpected GitHub OIDC subject')
+          }
+          NODE
+
       - name: Configure staging AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
