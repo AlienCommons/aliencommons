@@ -20,6 +20,7 @@ nav = [
     { Setup = "development/setup.md" },
     { "Node Tooling" = "development/node-tooling.md" },
     { "Frontend Internationalization" = "development/frontend-internationalization.md" },
+    { "Staging Infrastructure" = "development/staging-infrastructure.md" },
     { "Deployment Checklist" = "development/deployment-checklist.md" },
   ] },
 ]

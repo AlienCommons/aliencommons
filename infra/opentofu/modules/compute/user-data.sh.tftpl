@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+apt-get update
+apt-get install -y awscli ca-certificates docker.io docker-compose-v2 jq openssl
+
+install -d -m 0755 /etc/docker
+cat >/etc/docker/daemon.json <<'JSON'
+{
+  "live-restore": true,
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-file": "3",
+    "max-size": "10m"
+  }
+}
+JSON
+
+systemctl enable --now docker
+systemctl restart docker
+usermod -aG docker ubuntu
+
+install -d -m 0755 /srv/aliencommons
+install -d -m 0700 /srv/aliencommons/origin-certs
+install -d -m 0755 \
+  /srv/aliencommons/stg \
+  /srv/aliencommons/stg/alloy \
+  /srv/aliencommons/stg/grafana \
+  /srv/aliencommons/stg/loki \
+  /srv/aliencommons/stg/static
+
+if ! swapon --show=NAME --noheadings | grep -qx '/swapfile'; then
+  if ! fallocate -l 2G /swapfile; then
+    dd if=/dev/zero of=/swapfile bs=1M count=2048 status=progress
+  fi
+  chmod 0600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap sw 0 0' >>/etc/fstab
+fi

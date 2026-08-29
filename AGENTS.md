@@ -20,6 +20,7 @@ aliencommons/
 │   └── drf-std-response/ DRF response-envelope + exception-handler library used by the backend.
 ├── docs/                Three Zensical sites (users, contributors, alienmark). See docs/AGENTS.md.
 ├── infra/compose/       Docker Compose files for dev / stg / pro / proxy.
+├── infra/opentofu/      OpenTofu modules and environment roots for AWS/Cloudflare.
 ├── o11y/                Grafana, Loki, Grafana Alloy configs.
 ├── make/                docker.mk + node.mk, included by the root Makefile.
 ├── env/                 Environment files for local Compose (.env.dev, .env.test).
@@ -50,6 +51,7 @@ If an area has no dedicated guide, follow the conventions already present in nea
 | Python (backend + docs) | uv workspaces | root `pyproject.toml`, `uv.lock` |
 | Python lint | ruff | `apps/backend/ruff.toml` |
 | Containers | Docker Compose | `infra/compose/*.yml`, driven via `make/` |
+| Infrastructure | OpenTofu | `infra/opentofu/`, with remote S3 state per environment |
 | CI | GitHub Actions | `.github/workflows/ci.yml` |
 
 ## Environments
@@ -90,6 +92,11 @@ uv run zensical build --strict --config-file zensical.zh.toml
 pnpm turbo run check --filter=frontend
 pnpm turbo run check --filter=alienmark
 pnpm turbo run check --filter=alienmark-service
+
+# Staging infrastructure (from infra/opentofu/environments/stg)
+tofu fmt -check -recursive ../..
+tofu init -backend=false
+tofu validate
 ```
 
 All other Make targets live in [`make/docker.mk`](make/docker.mk) and [`make/node.mk`](make/node.mk).
@@ -106,6 +113,7 @@ Run the **smallest** check that covers your change. If a check cannot be run, sa
 | API contract | Regenerate `apps/backend/openapi/v1.yaml`, then run `pnpm --filter frontend api:generate` and commit both generated artifacts |
 | Docs site | Run both strict Zensical builds from `docs/<name>/` (default English config, then `zensical.zh.toml`) |
 | Unused-code audit (advisory) | `pnpm run knip` |
+| OpenTofu configuration | `tofu fmt -check -recursive ../..`, `tofu init -backend=false`, then `tofu validate` from the environment root |
 
 ### API contract synchronization
 

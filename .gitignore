@@ -84,4 +84,15 @@ env/.env.stg
 o11y/alloy/data/
 o11y/grafana/data/
 o11y/loki/data/
+
+# OpenTofu local state and plans
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+backend.*.hcl
+crash.log
+crash.*.log
 .gitnexus

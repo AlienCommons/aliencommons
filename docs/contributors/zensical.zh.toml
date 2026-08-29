@@ -20,6 +20,7 @@ nav = [
     { "开发设置" = "development/setup.md" },
     { "Node 工具链" = "development/node-tooling.md" },
     { "前端国际化" = "development/frontend-internationalization.md" },
+    { "预发布基础设施" = "development/staging-infrastructure.md" },
     { "部署待办" = "development/deployment-checklist.md" },
   ] },
 ]

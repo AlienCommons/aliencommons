@@ -1,0 +1,7 @@
+aws_account_id    = "replace-with-staging-account-id"
+state_bucket_name = "replace-with-staging-state-bucket"
+cloudflare_zone_id = "replace-with-cloudflare-zone-id"
+
+# Override only if the existing SecureString paths differ from the defaults.
+# origin_certificate_parameter_name = "/your/staging/origin-certificate"
+# origin_private_key_parameter_name  = "/your/staging/origin-private-key"
