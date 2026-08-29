@@ -20,9 +20,9 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "this" {
-  for_each = aws_s3_bucket.this
+  for_each = local.bucket_names
 
-  bucket = each.value.id
+  bucket = aws_s3_bucket.this[each.key].id
 
   rule {
     object_ownership = "BucketOwnerEnforced"
@@ -30,9 +30,9 @@ resource "aws_s3_bucket_ownership_controls" "this" {
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
-  for_each = aws_s3_bucket.this
+  for_each = local.bucket_names
 
-  bucket                  = each.value.id
+  bucket                  = aws_s3_bucket.this[each.key].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -40,9 +40,9 @@ resource "aws_s3_bucket_public_access_block" "this" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
-  for_each = aws_s3_bucket.this
+  for_each = local.bucket_names
 
-  bucket = each.value.id
+  bucket = aws_s3_bucket.this[each.key].id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -52,9 +52,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 }
 
 resource "aws_s3_bucket_versioning" "this" {
-  for_each = aws_s3_bucket.this
+  for_each = local.bucket_names
 
-  bucket = each.value.id
+  bucket = aws_s3_bucket.this[each.key].id
 
   versioning_configuration {
     status = "Enabled"
@@ -133,8 +133,8 @@ resource "aws_acm_certificate" "cdn" {
 resource "cloudflare_dns_record" "acm_validation" {
   for_each = {
     for option in aws_acm_certificate.cdn.domain_validation_options : option.domain_name => {
-      name    = option.resource_record_name
-      content = option.resource_record_value
+      name    = trimsuffix(option.resource_record_name, ".")
+      content = trimsuffix(option.resource_record_value, ".")
       type    = option.resource_record_type
     }
   }
@@ -153,8 +153,10 @@ resource "aws_acm_certificate_validation" "cdn" {
 
   certificate_arn = aws_acm_certificate.cdn.arn
   validation_record_fqdns = [
-    for record in cloudflare_dns_record.acm_validation : record.name
+    for option in aws_acm_certificate.cdn.domain_validation_options : option.resource_record_name
   ]
+
+  depends_on = [cloudflare_dns_record.acm_validation]
 }
 
 resource "aws_cloudfront_origin_access_control" "s3" {
@@ -184,10 +186,6 @@ resource "aws_cloudfront_distribution" "media" {
     domain_name              = aws_s3_bucket.this["media"].bucket_regional_domain_name
     origin_id                = "media-s3"
     origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
-
-    s3_origin_config {
-      origin_access_identity = ""
-    }
   }
 
   default_cache_behavior {
@@ -226,10 +224,6 @@ resource "aws_cloudfront_distribution" "docs" {
     domain_name              = aws_s3_bucket.this["docs"].bucket_regional_domain_name
     origin_id                = "docs-s3"
     origin_access_control_id = aws_cloudfront_origin_access_control.s3.id
-
-    s3_origin_config {
-      origin_access_identity = ""
-    }
   }
 
   default_cache_behavior {

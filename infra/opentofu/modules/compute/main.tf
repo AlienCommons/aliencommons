@@ -97,13 +97,12 @@ resource "aws_iam_instance_profile" "runtime" {
 }
 
 resource "aws_instance" "this" {
-  ami                         = data.aws_ssm_parameter.ami.value
-  instance_type               = var.instance_type
-  subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = [var.security_group_id]
-  associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.runtime.name
-  monitoring                  = true
+  ami                    = data.aws_ssm_parameter.ami.value
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = [var.security_group_id]
+  iam_instance_profile   = aws_iam_instance_profile.runtime.name
+  monitoring             = true
 
   credit_specification {
     cpu_credits = "standard"
