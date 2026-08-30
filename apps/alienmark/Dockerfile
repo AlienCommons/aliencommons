@@ -13,10 +13,11 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/alienmark/package.json apps/alienmark/package.json
 COPY packages/alienmark/package.json packages/alienmark/package.json
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --filter aliencommons --filter alienmark-service... --ignore-scripts
 
 FROM deps AS build
 
+COPY turbo.json vite.config.ts ./
 COPY apps/alienmark apps/alienmark
 COPY packages/alienmark packages/alienmark
 
