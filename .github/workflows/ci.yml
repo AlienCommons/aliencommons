@@ -281,7 +281,10 @@ jobs:
         run: tofu -chdir=infra/opentofu/environments/stg validate -no-color
 
       - name: Check deployment scripts
-        run: bash -n infra/deploy/stg/*.sh
+        run: >-
+          bash -n
+          infra/deploy/stg/*.sh
+          infra/opentofu/modules/compute/user-data.sh.tftpl
 
       - name: Test staging environment rendering
         run: infra/deploy/stg/test-render-environment.sh

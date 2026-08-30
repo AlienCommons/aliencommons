@@ -4,8 +4,25 @@ set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get update
-apt-get install -y awscli ca-certificates docker.io docker-compose-v2 jq openssl
+if ! command -v curl >/dev/null 2>&1 ||
+  ! command -v docker >/dev/null 2>&1 ||
+  ! docker compose version >/dev/null 2>&1 ||
+  ! command -v jq >/dev/null 2>&1 ||
+  ! command -v openssl >/dev/null 2>&1; then
+  apt-get update
+  apt-get install -y ca-certificates curl docker.io docker-compose-v2 jq openssl
+fi
+
+if ! command -v aws >/dev/null 2>&1; then
+  aws_cli_directory=$(mktemp -d)
+  trap 'rm -rf -- "${aws_cli_directory}"' EXIT
+  curl --fail --location --silent --show-error \
+    https://awscli.amazonaws.com/v2/install.sh \
+    --output "${aws_cli_directory}/install.sh"
+  bash "${aws_cli_directory}/install.sh" --system
+  rm -rf -- "${aws_cli_directory}"
+  trap - EXIT
+fi
 
 install -d -m 0755 /etc/docker
 cat >/etc/docker/daemon.json <<'JSON'
