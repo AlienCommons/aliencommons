@@ -248,6 +248,7 @@ openssl s_client \
   -connect 127.0.0.1:443 \
   -servername stg.aliencommons.com \
   -CAfile /srv/aliencommons/origin-certs/tls.crt \
+  -partial_chain \
   -verify_return_error </dev/null 2>/dev/null |
   grep -q 'Verify return code: 0 (ok)'
 
@@ -257,6 +258,7 @@ printf 'GET /api/health HTTP/1.1\r\nHost: grafana.stg.aliencommons.com\r\nConnec
     -connect 127.0.0.1:443 \
     -servername grafana.stg.aliencommons.com \
     -CAfile /srv/aliencommons/origin-certs/tls.crt \
+    -partial_chain \
     -verify_return_error 2>/dev/null |
   grep -q '"database"[[:space:]]*:[[:space:]]*"ok"'
 
