@@ -27,8 +27,8 @@ current_link=/srv/aliencommons/stg/current
 runtime_directory=/srv/aliencommons/stg/runtime
 runtime_environment=${runtime_directory}/.env.stg
 
-if [[ ! ${release_id} =~ ^[0-9a-f]{40}-[1-9][0-9]*$ ]]; then
-  echo "The release ID must contain a full Git commit SHA and workflow attempt." >&2
+if [[ ! ${release_id} =~ ^[0-9a-f]{40}-[1-9][0-9]*-[1-9][0-9]*$ ]]; then
+  echo "The release ID must contain a full Git commit SHA, workflow run ID, and attempt." >&2
   exit 1
 fi
 
