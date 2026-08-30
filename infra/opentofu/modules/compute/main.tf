@@ -126,7 +126,7 @@ resource "aws_instance" "this" {
     volume_type           = "gp3"
   }
 
-  user_data = templatefile("${path.module}/user-data.sh.tftpl", {})
+  user_data = file("${path.module}/user-data.sh.tftpl")
 
   tags = merge(var.tags, { Name = "${var.name_prefix}-host" })
 }
