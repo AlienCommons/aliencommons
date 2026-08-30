@@ -120,7 +120,7 @@ jobs:
           file: apps/backend/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ steps.targets.outputs.backend_repository }}:sha-${{ github.sha }}-${{ github.run_attempt }}
+          tags: ${{ steps.targets.outputs.backend_repository }}:sha-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           cache-from: type=gha,scope=stg-backend
           cache-to: type=gha,mode=max,scope=stg-backend
 
@@ -132,7 +132,7 @@ jobs:
           file: apps/frontend/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ steps.targets.outputs.frontend_repository }}:sha-${{ github.sha }}-${{ github.run_attempt }}
+          tags: ${{ steps.targets.outputs.frontend_repository }}:sha-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           cache-from: type=gha,scope=stg-frontend
           cache-to: type=gha,mode=max,scope=stg-frontend
 
@@ -144,7 +144,7 @@ jobs:
           file: apps/alienmark/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ steps.targets.outputs.alienmark_repository }}:sha-${{ github.sha }}-${{ github.run_attempt }}
+          tags: ${{ steps.targets.outputs.alienmark_repository }}:sha-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           cache-from: type=gha,scope=stg-alienmark
           cache-to: type=gha,mode=max,scope=stg-alienmark
 
@@ -158,7 +158,7 @@ jobs:
         run: |
           set -euo pipefail
           bundle_directory="${RUNNER_TEMP}/stg-bundle"
-          release_id="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          release_id="${GITHUB_SHA}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           bundle_file="${RUNNER_TEMP}/aliencommons-stg-${release_id}.tar.gz"
           mkdir -p "${bundle_directory}"
 
