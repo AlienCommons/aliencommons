@@ -205,6 +205,7 @@ jobs:
           set -euo pipefail
           parameters_file="${RUNNER_TEMP}/ssm-parameters.json"
           artifact_file="/tmp/aliencommons-stg-${RELEASE_ID}.tar.gz"
+          deployment_log="/var/log/aliencommons/stg-${RELEASE_ID}.log"
           host_bootstrap="$(base64 <infra/opentofu/modules/compute/user-data.sh.tftpl | tr -d '\n')"
 
           jq -n \
@@ -213,6 +214,7 @@ jobs:
             --arg key "${ARTIFACT_KEY}" \
             --arg checksum "${CHECKSUM}" \
             --arg artifact "${artifact_file}" \
+            --arg deployment_log "${deployment_log}" \
             --arg release "${RELEASE_ID}" \
             --arg host_bootstrap "${host_bootstrap}" \
             '{commands: [
@@ -220,11 +222,15 @@ jobs:
               "printf '\''%s'\'' \"" + $host_bootstrap + "\" | base64 --decode | bash",
               "work_directory=$(mktemp -d)",
               "artifact=\"" + $artifact + "\"",
+              "deployment_log=\"" + $deployment_log + "\"",
               "trap '\''rm -rf -- \"${work_directory}\"; rm -f -- \"${artifact}\"'\'' EXIT",
               "AWS_REGION=\"" + $region + "\" aws s3 cp \"s3://" + $bucket + "/" + $key + "\" \"" + $artifact + "\"",
               "printf '\''%s  %s\\n'\'' \"" + $checksum + "\" \"" + $artifact + "\" | sha256sum --check --strict",
               "tar -xzf \"" + $artifact + "\" -C \"${work_directory}\"",
-              "AWS_REGION=\"" + $region + "\" bash \"${work_directory}/infra/deploy/stg/deploy-release.sh\" \"${work_directory}\" \"" + $release + "\""
+              "install -d -m 0700 /var/log/aliencommons",
+              "install -m 0600 /dev/null \"${deployment_log}\"",
+              "if ! AWS_REGION=\"" + $region + "\" bash \"${work_directory}/infra/deploy/stg/deploy-release.sh\" \"${work_directory}\" \"" + $release + "\" >\"${deployment_log}\" 2>&1; then tail -n 200 \"${deployment_log}\" >&2; exit 1; fi",
+              "tail -n 200 \"${deployment_log}\""
             ]}' >"${parameters_file}"
 
           command_id="$(aws ssm send-command \

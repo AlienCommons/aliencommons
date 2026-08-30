@@ -96,8 +96,8 @@ staging_compose=(
 
 "${proxy_compose[@]}" config --quiet
 "${staging_compose[@]}" config --quiet
-"${proxy_compose[@]}" pull
-"${staging_compose[@]}" pull
+"${proxy_compose[@]}" pull --quiet
+"${staging_compose[@]}" pull --quiet
 
 docker network inspect aliencommons-proxy >/dev/null 2>&1 ||
   docker network create aliencommons-proxy >/dev/null

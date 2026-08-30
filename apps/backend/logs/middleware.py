@@ -30,7 +30,7 @@ class RequestLoggingMiddleware:
 
         logger.info(
             f"Request completed: {request.method} {request.path} "
-            f"status={request.status_code} duration_ms={duration_ms}"
+            f"status={response.status_code} duration_ms={duration_ms}"
         )
 
         clear_log_context()

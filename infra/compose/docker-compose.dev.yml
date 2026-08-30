@@ -75,7 +75,7 @@ services:
     working_dir: /code/apps/backend
     restart: unless-stopped
     command: >
-      sh -c "python manage.py rqworker default email maintenance"
+      sh -c "python manage.py rqworker --job-class django_tasks_rq.Job default email maintenance"
     depends_on:
       - redis
       - postgres

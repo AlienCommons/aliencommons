@@ -76,7 +76,7 @@ dev-backend-runscheduler:
 	$(DEV_MANAGE) runscheduler
 
 dev-backend-runrqworker:
-	$(DEV_MANAGE) rqworker default email maintenance
+	$(DEV_MANAGE) rqworker --job-class django_tasks_rq.Job default email maintenance
 
 # STAGING
 stg-up: proxy-network
