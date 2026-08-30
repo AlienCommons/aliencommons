@@ -214,7 +214,7 @@ jobs:
             --arg artifact "${artifact_file}" \
             --arg release "${RELEASE_ID}" \
             '{commands: [
-              "set -euo pipefail",
+              "set -eu",
               "work_directory=$(mktemp -d)",
               "trap '\''rm -rf -- \"${work_directory}\"; rm -f -- \"${artifact}\"'\'' EXIT",
               "AWS_REGION=\"" + $region + "\" aws s3 cp \"s3://" + $bucket + "/" + $key + "\" \"" + $artifact + "\"",
