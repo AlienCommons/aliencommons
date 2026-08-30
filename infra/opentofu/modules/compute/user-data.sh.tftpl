@@ -7,10 +7,12 @@ export DEBIAN_FRONTEND=noninteractive
 if ! command -v curl >/dev/null 2>&1 ||
   ! command -v docker >/dev/null 2>&1 ||
   ! docker compose version >/dev/null 2>&1 ||
+  ! command -v gpg >/dev/null 2>&1 ||
   ! command -v jq >/dev/null 2>&1 ||
-  ! command -v openssl >/dev/null 2>&1; then
+  ! command -v openssl >/dev/null 2>&1 ||
+  ! command -v unzip >/dev/null 2>&1; then
   apt-get update
-  apt-get install -y ca-certificates curl docker.io docker-compose-v2 jq openssl
+  apt-get install -y ca-certificates curl docker.io docker-compose-v2 gnupg jq openssl unzip
 fi
 
 if ! command -v aws >/dev/null 2>&1; then
