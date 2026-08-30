@@ -42,20 +42,21 @@ module "storage_cdn" {
 module "compute" {
   source = "../../modules/compute"
 
-  name_prefix                       = local.name_prefix
-  aws_account_id                    = var.aws_account_id
-  aws_region                        = var.aws_region
-  subnet_id                         = module.network.public_subnet_id
-  security_group_id                 = module.network.origin_security_group_id
-  instance_type                     = var.instance_type
-  root_volume_size                  = var.root_volume_size
-  ami_ssm_parameter_name            = var.ami_ssm_parameter_name
-  ecr_repository_arns               = toset(values(module.registry.repository_arns))
-  media_bucket_arn                  = module.storage_cdn.media_bucket_arn
-  deployment_bucket_arn             = module.storage_cdn.deployment_bucket_arn
-  origin_certificate_parameter_name = var.origin_certificate_parameter_name
-  origin_private_key_parameter_name = var.origin_private_key_parameter_name
-  tags                              = local.common_tags
+  name_prefix                        = local.name_prefix
+  aws_account_id                     = var.aws_account_id
+  aws_region                         = var.aws_region
+  subnet_id                          = module.network.public_subnet_id
+  security_group_id                  = module.network.origin_security_group_id
+  instance_type                      = var.instance_type
+  root_volume_size                   = var.root_volume_size
+  ami_ssm_parameter_name             = var.ami_ssm_parameter_name
+  ecr_repository_arns                = toset(values(module.registry.repository_arns))
+  media_bucket_arn                   = module.storage_cdn.media_bucket_arn
+  deployment_bucket_arn              = module.storage_cdn.deployment_bucket_arn
+  origin_certificate_parameter_name  = var.origin_certificate_parameter_name
+  origin_private_key_parameter_name  = var.origin_private_key_parameter_name
+  application_secret_parameter_names = var.application_secret_parameter_names
+  tags                               = local.common_tags
 }
 
 resource "cloudflare_dns_record" "application_origin" {

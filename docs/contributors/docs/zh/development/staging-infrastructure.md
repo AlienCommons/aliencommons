@@ -10,8 +10,9 @@ distributions、AWS 管理的 ACM certificate、应用 DNS records 和 GitHub OI
 state bucket、Organizations 结构、Budget、Cloudflare Zone 级 SSL 设置、Advanced Edge
 Certificate，也不会管理 Origin CA certificate 的内容。
 
-Origin CA certificate 和 private key 继续保存在两个预先创建的 SSM `SecureString` 中。
-OpenTofu 只接收 parameter name，secret value 不会进入 state。
+Origin CA certificate、private key 和应用运行时 Secrets 都保存在预先创建的 SSM
+`SecureString` 中。OpenTofu 只接收 parameter name，secret value 不会进入 state；EC2
+runtime role 也只能读取清单中明确列出的预发布参数。
 
 ## 在可信电脑上执行一次 Bootstrap
 
@@ -46,6 +47,14 @@ revision 才运行 `apply`，并输入要求的确认文字。Workflow 会串行
 
 ## 创建资源之后
 
-使用 Systems Manager Session Manager 管理主机，不使用 SSH。把两个 Origin CA 材料从 SSM
-安装到主机，向 ECR 发布固定到 digest 的应用镜像，再启动 Traefik 和预发布应用 stack。公网流量
-必须继续通过使用 `Full (strict)` 模式的 Cloudflare。
+使用 Systems Manager Session Manager 管理主机，不使用 SSH。手动触发的 `Stg Application:
+Deploy` workflow 只能从 `dev` 运行，并要求输入 `deploy-stg` 确认文本。它向 ECR 发布固定到
+digest 的应用镜像，把带 checksum 的部署 bundle 上传到私有 deployment bucket，再通过 SSM Run
+Command 调用主机。
+
+主机上的部署脚本会直接从 SSM 读取六项应用 Secrets，生成仅 root 可读的 `0600` 运行时环境文件，
+安装并校验 Origin CA 材料，拉取不可变镜像，执行 migrations 与 static collection，并等待服务通过
+健康检查。Secret value 不会进入 bundle，也不会返回 GitHub Actions。最后 workflow 会验证
+Cloudflare `Full (strict)`、确认源站无法直连，并执行公网 smoke checks。只有主机侧检查全部通过后
+才会切换 `current` release 链接；更新失败时会尽力恢复上一组容器。数据库 migration 不会自动
+回滚，因此预发布 migration 必须与上一版应用镜像保持向后兼容。

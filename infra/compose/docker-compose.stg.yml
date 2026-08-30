@@ -1,41 +1,98 @@
-x-stack-env: &stack-env
-  env_file:
-    - ../../env/.env.stg
+x-backend-environment: &backend-environment
+  DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:?Set DJANGO_SETTINGS_MODULE in env/.env.stg}
+  SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in env/.env.stg}
+  SITE_URL: ${SITE_URL:?Set SITE_URL in env/.env.stg}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:?Set ALLOWED_HOSTS in env/.env.stg}
+  CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?Set CORS_ALLOWED_ORIGINS in env/.env.stg}
+  DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:?Set DEFAULT_FROM_EMAIL in env/.env.stg}
+  SERVER_EMAIL: ${SERVER_EMAIL:?Set SERVER_EMAIL in env/.env.stg}
+  EMAIL_HOST: ${EMAIL_HOST:?Set EMAIL_HOST in env/.env.stg}
+  EMAIL_PORT: ${EMAIL_PORT:?Set EMAIL_PORT in env/.env.stg}
+  EMAIL_HOST_USER: ${EMAIL_HOST_USER:?Set EMAIL_HOST_USER in env/.env.stg}
+  EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:?Set EMAIL_HOST_PASSWORD in env/.env.stg}
+  EMAIL_USE_TLS: ${EMAIL_USE_TLS:?Set EMAIL_USE_TLS in env/.env.stg}
+  EMAIL_USE_SSL: ${EMAIL_USE_SSL:?Set EMAIL_USE_SSL in env/.env.stg}
+  POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in env/.env.stg}
+  POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in env/.env.stg}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in env/.env.stg}
+  POSTGRES_HOST: ${POSTGRES_HOST:?Set POSTGRES_HOST in env/.env.stg}
+  REDIS_URL: ${REDIS_URL:?Set REDIS_URL in env/.env.stg}
+  REDIS_KEY_PREFIX: ${REDIS_KEY_PREFIX:?Set REDIS_KEY_PREFIX in env/.env.stg}
+  AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME:?Set AWS_STORAGE_BUCKET_NAME in env/.env.stg}
+  AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME:?Set AWS_S3_REGION_NAME in env/.env.stg}
+  AWS_S3_CUSTOM_DOMAIN: ${AWS_S3_CUSTOM_DOMAIN:?Set AWS_S3_CUSTOM_DOMAIN in env/.env.stg}
 
 name: aliencommons-stg
 
 services:
   postgres:
-    <<: *stack-env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in env/.env.stg}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in env/.env.stg}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in env/.env.stg}
     volumes:
       - postgres_data_stg:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
   redis:
-    <<: *stack-env
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD in env/.env.stg}
     command: >
       sh -c 'redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"'
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
   backend-init:
-    <<: *stack-env
     image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
+    environment: *backend-environment
     working_dir: /code/apps/backend
     command: >
-      sh -c "python manage.py migrate && python manage.py init_tasks"
+      sh -c "python manage.py migrate && python manage.py init_tasks && python manage.py collectstatic --noinput"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - /srv/aliencommons/stg/static:/code/apps/backend/staticfiles
 
   backend-api:
-    <<: *stack-env
     image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
     working_dir: /code/apps/backend
     restart: unless-stopped
     environment:
+      <<: *backend-environment
       INTERNAL_ALLOWED_HOSTS: backend-api
     command: >
       sh -c "daphne -b 0.0.0.0 -p 8000 backend.asgi:application"
     depends_on:
-      - alienmark
+      alienmark:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://backend-api:8000/v1/sessions/csrf/', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend-api-stg.rule=Host(`api.stg.aliencommons.com`)"
@@ -56,16 +113,16 @@ services:
       - /srv/aliencommons/stg/static:/code/apps/backend/staticfiles
 
   backend-task-scheduler:
-    <<: *stack-env
     image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
+    environment: *backend-environment
     working_dir: /code/apps/backend
     restart: unless-stopped
     command: >
       sh -c "python manage.py runscheduler"
 
   backend-task-worker:
-    <<: *stack-env
     image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in env/.env.stg}
+    environment: *backend-environment
     working_dir: /code/apps/backend
     restart: unless-stopped
     command: >
@@ -86,7 +143,7 @@ services:
       ALLOY_ENVIRONMENT: stg
     volumes:
       - ../../o11y/alloy/config.alloy:/etc/alloy/config.alloy:ro
-      - /srv/aliencommons/stg/alloy:/var/lib/alloy/data
+      - alloy_data_stg:/var/lib/alloy/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       loki:
@@ -103,7 +160,7 @@ services:
       LOKI_RETENTION_PERIOD: 336h
     volumes:
       - ../../o11y/loki/loki.yml:/etc/loki/loki.yml:ro
-      - /srv/aliencommons/stg/loki:/loki
+      - loki_data_stg:/loki
     # The official Loki image is distroless, so health checks cannot use a shell.
     healthcheck:
       test:
@@ -144,7 +201,7 @@ services:
       - proxy
     volumes:
       - ../../o11y/grafana/provisioning/datasources/loki.yml:/etc/grafana/provisioning/datasources/loki.yml:ro
-      - /srv/aliencommons/stg/grafana:/var/lib/grafana
+      - grafana_data_stg:/var/lib/grafana
     depends_on:
       loki:
         condition: service_healthy
@@ -166,6 +223,18 @@ services:
     networks:
       - default
       - proxy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/').then(response => { if (!response.ok) process.exit(1) }).catch(() => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   alienmark:
     image: ${ALIENMARK_IMAGE:?Set ALIENMARK_IMAGE in env/.env.stg}
@@ -173,6 +242,18 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 8787
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8787/health').then(response => { if (!response.ok) process.exit(1) }).catch(() => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
 
   static:
     image: nginx:alpine
@@ -190,6 +271,9 @@ services:
 
 volumes:
   postgres_data_stg:
+  alloy_data_stg:
+  grafana_data_stg:
+  loki_data_stg:
 
 networks:
   proxy:

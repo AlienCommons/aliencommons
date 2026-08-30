@@ -64,6 +64,11 @@ variable "origin_private_key_parameter_name" {
   type        = string
 }
 
+variable "application_secret_parameter_names" {
+  description = "SSM SecureString names containing staging application runtime secrets."
+  type        = set(string)
+}
+
 variable "tags" {
   description = "Tags applied to all supported resources."
   type        = map(string)

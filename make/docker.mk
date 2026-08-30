@@ -83,7 +83,7 @@ stg-up: proxy-network
 	$(STG_COMPOSE) up -d $(DB)
 	$(STG_COMPOSE) run --rm backend-init
 	$(STG_COMPOSE) up -d $(OBSERVE)
-	$(STG_COMPOSE) up -d $(APP)
+	$(STG_COMPOSE) up -d $(APP) static
 
 stg-down:
 	$(STG_COMPOSE) down

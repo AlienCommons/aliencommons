@@ -12,9 +12,10 @@ application DNS records, and GitHub OIDC roles. It intentionally does not own
 the state bucket, Organizations structure, budgets, Cloudflare zone-wide SSL
 settings, Advanced Edge Certificate, or Origin CA certificate values.
 
-The Origin CA certificate and private key remain in two pre-created SSM
-`SecureString` parameters. OpenTofu receives only their parameter names so the
-secret values never enter state.
+The Origin CA certificate, private key, and application runtime secrets remain
+in pre-created SSM `SecureString` parameters. OpenTofu receives only their
+parameter names so secret values never enter state. The EC2 runtime role can
+read only the explicitly listed staging parameters.
 
 ## Bootstrap once from a trusted workstation
 
@@ -53,7 +54,19 @@ saved plan as an artifact.
 
 ## After provisioning
 
-Use Systems Manager Session Manager instead of SSH. Install the two Origin CA
-materials from SSM on the host, publish digest-pinned application images to ECR,
-and then start Traefik and the staging application stack. Public traffic must
-continue through Cloudflare in `Full (strict)` mode.
+Use Systems Manager Session Manager instead of SSH. The manual `Stg Application:
+Deploy` workflow runs only from `dev` and requires the `deploy-stg` confirmation.
+It publishes digest-pinned application images to ECR, uploads a checksum-protected
+deployment bundle to the private deployment bucket, and invokes the host through
+SSM Run Command.
+
+On the host, the deployment script reads the six application secrets directly
+from SSM, creates a root-owned `0600` runtime environment file, installs and
+validates the Origin CA pair, pulls the immutable images, runs migrations and
+static collection, and waits for service health checks. Secret values are never
+placed in the bundle or returned to GitHub Actions. The workflow then verifies
+Cloudflare `Full (strict)`, checks that direct origin access is blocked, and runs
+public smoke checks. The `current` release link changes only after all host-side
+checks pass; a failed update makes a best-effort return to the previous container
+set. Database migrations are not reversed, so staging migrations must remain
+backward compatible with the previous application image.

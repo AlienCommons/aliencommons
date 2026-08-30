@@ -127,6 +127,24 @@ variable "origin_private_key_parameter_name" {
   }
 }
 
+variable "application_secret_parameter_names" {
+  description = "Existing SSM SecureString names containing staging application secrets."
+  type        = set(string)
+  default = [
+    "/aliencommons/stg/app/django-secret-key",
+    "/aliencommons/stg/app/email-host-password",
+    "/aliencommons/stg/app/email-host-user",
+    "/aliencommons/stg/app/grafana-admin-password",
+    "/aliencommons/stg/app/postgres-password",
+    "/aliencommons/stg/app/redis-password",
+  ]
+
+  validation {
+    condition     = alltrue([for parameter_name in var.application_secret_parameter_names : startswith(parameter_name, "/aliencommons/stg/app/")])
+    error_message = "Every application secret parameter must be under /aliencommons/stg/app/."
+  }
+}
+
 variable "cloudfront_price_class" {
   description = "CloudFront edge-location price class used as the private S3 gateway."
   type        = string

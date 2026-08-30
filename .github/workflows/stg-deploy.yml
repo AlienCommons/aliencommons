@@ -1,0 +1,291 @@
+name: "Stg Application: Deploy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Enter deploy-stg to build and deploy the current dev revision"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: stg-application-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment: stg
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      AWS_REGION: ${{ vars.AWS_STG_REGION }}
+      NAME_PREFIX: aliencommons-stg
+
+    steps:
+      - name: Validate staging deployment request
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          if [[ "${GITHUB_REF}" != refs/heads/dev ]]; then
+            echo "Staging deployments must run from the dev branch." >&2
+            exit 1
+          fi
+          if [[ "${CONFIRMATION}" != deploy-stg ]]; then
+            echo "Refusing to deploy without the exact deploy-stg confirmation." >&2
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Configure staging AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-region: ${{ vars.AWS_STG_REGION }}
+          role-to-assume: ${{ vars.AWS_STG_ROLE_TO_ASSUME }}
+          allowed-account-ids: ${{ vars.AWS_STG_ACCOUNT_ID }}
+          mask-aws-account-id: true
+
+      - name: Resolve staging deployment targets
+        id: targets
+        env:
+          AWS_STG_ACCOUNT_ID: ${{ vars.AWS_STG_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+
+          registry="${AWS_STG_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+          backend_repository="${registry}/${NAME_PREFIX}-backend"
+          frontend_repository="${registry}/${NAME_PREFIX}-frontend"
+          alienmark_repository="${registry}/${NAME_PREFIX}-alienmark"
+          deployment_bucket="${NAME_PREFIX}-deployment-${AWS_STG_ACCOUNT_ID}"
+          media_bucket="${NAME_PREFIX}-media-${AWS_STG_ACCOUNT_ID}"
+
+          aws s3api head-bucket --bucket "${deployment_bucket}"
+
+          instance_id="$(aws ec2 describe-instances \
+            --filters \
+              "Name=tag:Name,Values=${NAME_PREFIX}-host" \
+              "Name=instance-state-name,Values=running" \
+            --query 'Reservations[].Instances[].InstanceId' \
+            --output text)"
+          if [[ -z "${instance_id}" || "${instance_id}" == *$'\t'* ]]; then
+            echo "Expected exactly one running staging instance." >&2
+            exit 1
+          fi
+
+          origin_ipv4="$(aws ec2 describe-instances \
+            --instance-ids "${instance_id}" \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)"
+
+          echo "::add-mask::${backend_repository}"
+          echo "::add-mask::${frontend_repository}"
+          echo "::add-mask::${alienmark_repository}"
+          echo "::add-mask::${deployment_bucket}"
+          echo "::add-mask::${media_bucket}"
+          echo "::add-mask::${instance_id}"
+          echo "::add-mask::${origin_ipv4}"
+
+          {
+            echo "backend_repository=${backend_repository}"
+            echo "frontend_repository=${frontend_repository}"
+            echo "alienmark_repository=${alienmark_repository}"
+            echo "deployment_bucket=${deployment_bucket}"
+            echo "media_bucket=${media_bucket}"
+            echo "instance_id=${instance_id}"
+            echo "origin_ipv4=${origin_ipv4}"
+          } >>"${GITHUB_OUTPUT}"
+
+      - name: Authenticate Docker to ECR
+        env:
+          BACKEND_REPOSITORY: ${{ steps.targets.outputs.backend_repository }}
+        run: |
+          registry="${BACKEND_REPOSITORY%%/*}"
+          aws ecr get-login-password |
+            docker login --username AWS --password-stdin "${registry}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push backend image
+        id: backend
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.targets.outputs.backend_repository }}:sha-${{ github.sha }}-${{ github.run_attempt }}
+          cache-from: type=gha,scope=stg-backend
+          cache-to: type=gha,mode=max,scope=stg-backend
+
+      - name: Build and push frontend image
+        id: frontend
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/frontend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.targets.outputs.frontend_repository }}:sha-${{ github.sha }}-${{ github.run_attempt }}
+          cache-from: type=gha,scope=stg-frontend
+          cache-to: type=gha,mode=max,scope=stg-frontend
+
+      - name: Build and push AlienMark image
+        id: alienmark
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/alienmark/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.targets.outputs.alienmark_repository }}:sha-${{ github.sha }}-${{ github.run_attempt }}
+          cache-from: type=gha,scope=stg-alienmark
+          cache-to: type=gha,mode=max,scope=stg-alienmark
+
+      - name: Build deployment bundle
+        id: bundle
+        env:
+          BACKEND_IMAGE: ${{ steps.targets.outputs.backend_repository }}@${{ steps.backend.outputs.digest }}
+          FRONTEND_IMAGE: ${{ steps.targets.outputs.frontend_repository }}@${{ steps.frontend.outputs.digest }}
+          ALIENMARK_IMAGE: ${{ steps.targets.outputs.alienmark_repository }}@${{ steps.alienmark.outputs.digest }}
+          MEDIA_BUCKET: ${{ steps.targets.outputs.media_bucket }}
+        run: |
+          set -euo pipefail
+          bundle_directory="${RUNNER_TEMP}/stg-bundle"
+          release_id="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          bundle_file="${RUNNER_TEMP}/aliencommons-stg-${release_id}.tar.gz"
+          mkdir -p "${bundle_directory}"
+
+          git archive HEAD \
+            Makefile \
+            make/docker.mk \
+            infra/compose \
+            infra/deploy/stg \
+            infra/traefik \
+            o11y |
+            tar -x -C "${bundle_directory}"
+
+          {
+            echo "BACKEND_IMAGE=${BACKEND_IMAGE}"
+            echo "FRONTEND_IMAGE=${FRONTEND_IMAGE}"
+            echo "ALIENMARK_IMAGE=${ALIENMARK_IMAGE}"
+            echo "AWS_STORAGE_BUCKET_NAME=${MEDIA_BUCKET}"
+          } >"${bundle_directory}/deployment.env"
+
+          tar -czf "${bundle_file}" -C "${bundle_directory}" .
+          checksum="$(sha256sum "${bundle_file}" | awk '{print $1}')"
+          artifact_key="deployments/${release_id}/bundle.tar.gz"
+
+          echo "bundle_file=${bundle_file}" >>"${GITHUB_OUTPUT}"
+          echo "checksum=${checksum}" >>"${GITHUB_OUTPUT}"
+          echo "artifact_key=${artifact_key}" >>"${GITHUB_OUTPUT}"
+          echo "release_id=${release_id}" >>"${GITHUB_OUTPUT}"
+
+      - name: Upload deployment bundle
+        env:
+          BUNDLE_FILE: ${{ steps.bundle.outputs.bundle_file }}
+          DEPLOYMENT_BUCKET: ${{ steps.targets.outputs.deployment_bucket }}
+          ARTIFACT_KEY: ${{ steps.bundle.outputs.artifact_key }}
+        run: aws s3 cp "${BUNDLE_FILE}" "s3://${DEPLOYMENT_BUCKET}/${ARTIFACT_KEY}"
+
+      - name: Deploy bundle through Systems Manager
+        env:
+          DEPLOYMENT_BUCKET: ${{ steps.targets.outputs.deployment_bucket }}
+          ARTIFACT_KEY: ${{ steps.bundle.outputs.artifact_key }}
+          CHECKSUM: ${{ steps.bundle.outputs.checksum }}
+          RELEASE_ID: ${{ steps.bundle.outputs.release_id }}
+          INSTANCE_ID: ${{ steps.targets.outputs.instance_id }}
+        run: |
+          set -euo pipefail
+          parameters_file="${RUNNER_TEMP}/ssm-parameters.json"
+          artifact_file="/tmp/aliencommons-stg-${RELEASE_ID}.tar.gz"
+
+          jq -n \
+            --arg region "${AWS_REGION}" \
+            --arg bucket "${DEPLOYMENT_BUCKET}" \
+            --arg key "${ARTIFACT_KEY}" \
+            --arg checksum "${CHECKSUM}" \
+            --arg artifact "${artifact_file}" \
+            --arg release "${RELEASE_ID}" \
+            '{commands: [
+              "set -euo pipefail",
+              "work_directory=$(mktemp -d)",
+              "trap '\''rm -rf -- \"${work_directory}\"; rm -f -- \"${artifact}\"'\'' EXIT",
+              "AWS_REGION=\"" + $region + "\" aws s3 cp \"s3://" + $bucket + "/" + $key + "\" \"" + $artifact + "\"",
+              "printf '\''%s  %s\\n'\'' \"" + $checksum + "\" \"" + $artifact + "\" | sha256sum --check --strict",
+              "tar -xzf \"" + $artifact + "\" -C \"${work_directory}\"",
+              "AWS_REGION=\"" + $region + "\" bash \"${work_directory}/infra/deploy/stg/deploy-release.sh\" \"${work_directory}\" \"" + $release + "\""
+            ]}' >"${parameters_file}"
+
+          command_id="$(aws ssm send-command \
+            --instance-ids "${INSTANCE_ID}" \
+            --document-name AWS-RunShellScript \
+            --comment "Deploy AlienCommons staging ${RELEASE_ID}" \
+            --parameters "file://${parameters_file}" \
+            --query 'Command.CommandId' \
+            --output text)"
+          echo "::add-mask::${command_id}"
+
+          status=Pending
+          for _ in $(seq 1 180); do
+            status="$(aws ssm get-command-invocation \
+              --command-id "${command_id}" \
+              --instance-id "${INSTANCE_ID}" \
+              --query Status \
+              --output text 2>/dev/null || true)"
+            case "${status}" in
+              Success | Cancelled | Failed | TimedOut | Cancelling) break ;;
+            esac
+            sleep 10
+          done
+
+          invocation="$(aws ssm get-command-invocation \
+            --command-id "${command_id}" \
+            --instance-id "${INSTANCE_ID}" \
+            --query '{Status:Status,Output:StandardOutputContent,Error:StandardErrorContent}' \
+            --output json)"
+          jq -r '.Output, .Error' <<<"${invocation}"
+          status="$(jq -r '.Status' <<<"${invocation}")"
+          if [[ ${status} != Success ]]; then
+            echo "Staging deployment failed with SSM status ${status}." >&2
+            exit 1
+          fi
+
+      - name: Verify Cloudflare Full strict
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
+        run: |
+          ssl_mode="$(curl --fail --silent --show-error \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/settings/ssl" |
+            jq -er '.result.value')"
+          if [[ ${ssl_mode} != strict ]]; then
+            echo "Cloudflare SSL mode must be Full (strict)." >&2
+            exit 1
+          fi
+
+      - name: Verify direct origin access is blocked
+        env:
+          ORIGIN_IPV4: ${{ steps.targets.outputs.origin_ipv4 }}
+        run: |
+          if curl --silent --show-error --insecure --connect-timeout 5 \
+            "https://${ORIGIN_IPV4}/" >/dev/null; then
+            echo "The staging origin accepted traffic outside Cloudflare." >&2
+            exit 1
+          fi
+
+      - name: Run public staging smoke checks
+        run: |
+          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors \
+            https://stg.aliencommons.com/ >/dev/null
+          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors \
+            https://api.stg.aliencommons.com/v1/sessions/csrf/ >/dev/null
+          curl --fail --silent --show-error --retry 12 --retry-delay 5 --retry-all-errors \
+            https://grafana.stg.aliencommons.com/api/health >/dev/null

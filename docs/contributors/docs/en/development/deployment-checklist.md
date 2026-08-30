@@ -20,14 +20,22 @@ persistent volumes.
 
 ## Configure the application environment
 
-Create the environment-specific local file from the matching tracked example:
+For local or production operation, create the environment-specific file from
+the matching tracked example:
 
 ```bash
-cp env/.env.stg.example env/.env.stg  # staging host only
 cp env/.env.pro.example env/.env.pro  # production host only
 ```
 
-Replace every placeholder before starting the stack. The AWS media bucket and
+Staging does not use a manually maintained environment file. Store its Django,
+PostgreSQL, Redis, Grafana, and SES credentials as separate SSM `SecureString`
+parameters under `/aliencommons/stg/app/`. The staging deployment script reads
+those parameters on the EC2 host and atomically creates a root-owned `0600`
+`env/.env.stg` file. Never put staging secret values in GitHub variables,
+deployment bundles, or OpenTofu inputs.
+
+For manually managed environments, replace every placeholder before starting
+the stack. The AWS media bucket and
 custom domain must belong to the same member account as the deployment. Hosted
 containers obtain AWS credentials from an IAM workload role; do not add access
 keys to these files. Staging uses immutable ECR image references for
@@ -49,6 +57,11 @@ Environment with `AWS_STG_ACCOUNT_ID`, `AWS_STG_REGION`,
 variable `AWS_DOCS_DEPLOY_ENABLED` to `true`. Scope the role's OIDC trust to the
 repository's `stg` GitHub Environment and grant it access only to the staging
 documentation destination.
+
+The application deployment uses the `AWS_STG_ROLE_TO_ASSUME` Environment
+variable and requires no long-lived AWS credentials. Trigger `Stg Application:
+Deploy` from `dev`, enter `deploy-stg`, and review the SSM deployment output and
+the final smoke checks before treating the release as successful.
 
 ## Configure Traefik
 

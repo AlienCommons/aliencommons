@@ -71,15 +71,18 @@ data "aws_iam_policy_document" "runtime" {
   }
 
   statement {
-    sid = "ReadOriginCertificateParameters"
-    actions = [
-      "ssm:GetParameter",
-      "ssm:GetParameters",
-    ]
-    resources = [
-      "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${var.origin_certificate_parameter_name}",
-      "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${var.origin_private_key_parameter_name}",
-    ]
+    sid     = "ReadRuntimeSecretParameters"
+    actions = ["ssm:GetParameter"]
+    resources = toset(concat(
+      [
+        "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${var.origin_certificate_parameter_name}",
+        "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${var.origin_private_key_parameter_name}",
+      ],
+      [
+        for parameter_name in var.application_secret_parameter_names :
+        "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${parameter_name}"
+      ],
+    ))
   }
 }
 

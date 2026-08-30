@@ -13,14 +13,21 @@ AlienCommons 使用一个只负责治理的 AWS Organizations Management Account
 
 ## 配置应用环境
 
-根据仓库中的对应示例创建环境专用的本地文件：
+本地或生产环境可以根据仓库中的对应示例创建环境专用文件：
 
 ```bash
-cp env/.env.stg.example env/.env.stg  # 仅在预发布主机执行
 cp env/.env.pro.example env/.env.pro  # 仅在生产主机执行
 ```
 
-启动服务前替换所有占位值。AWS 媒体 bucket 和自定义域名必须属于部署所在的同一个 Member Account。托管容器通过 IAM workload role 获取 AWS 凭据；不要把 Access Key 写入这些文件。预发布环境通过 `BACKEND_IMAGE`、`FRONTEND_IMAGE` 和 `ALIENMARK_IMAGE` 使用不可变的 ECR 镜像引用；部署工作流必须在启动 Compose 前填入固定到 digest 的引用。
+预发布环境不再人工维护环境文件。把 Django、PostgreSQL、Redis、Grafana 和 SES credentials
+分别保存为 `/aliencommons/stg/app/` 下的 SSM `SecureString`。预发布部署脚本会在 EC2 主机上读取
+这些参数，并以原子方式生成 root 所有、权限为 `0600` 的 `env/.env.stg`。不得把预发布 Secret
+value 放进 GitHub variables、部署 bundle 或 OpenTofu inputs。
+
+人工管理的环境仍需在启动服务前替换所有占位值。AWS 媒体 bucket 和自定义域名必须属于部署所在的
+同一个 Member Account。托管容器通过 IAM workload role 获取 AWS 凭据；不要把 Access Key 写入
+这些文件。预发布环境通过 `BACKEND_IMAGE`、`FRONTEND_IMAGE` 和 `ALIENMARK_IMAGE` 使用不可变的
+ECR 镜像引用；部署工作流必须在启动 Compose 前填入固定到 digest 的引用。
 
 预发布公网域名为：
 
@@ -31,6 +38,10 @@ cp env/.env.pro.example env/.env.pro  # 仅在生产主机执行
 - `docs.stg.aliencommons.com`：已部署文档。
 
 在新的预发布 S3 目标和 GitHub OIDC Role 就绪前，AlienMark 文档部署默认停用。启用时，在 GitHub 的 `stg` Environment 中配置 `AWS_STG_ACCOUNT_ID`、`AWS_STG_REGION`、`AWS_STG_ROLE_TO_ASSUME` 和 `AWS_STG_S3_BUCKET`，然后将 repository variable `AWS_DOCS_DEPLOY_ENABLED` 设置为 `true`。该 Role 的 OIDC trust 必须限定到仓库的 `stg` GitHub Environment，并且只能访问预发布文档目标。
+
+应用部署使用 GitHub Environment 中的 `AWS_STG_ROLE_TO_ASSUME`，不需要长期 AWS credentials。
+从 `dev` 手动触发 `Stg Application: Deploy`，输入 `deploy-stg`，并在认定发布成功前检查 SSM
+部署输出和最后的 smoke checks。
 
 ## 配置 Traefik
 
