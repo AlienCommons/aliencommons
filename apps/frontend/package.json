@@ -21,14 +21,14 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxt/icon": "^2.5.0",
+    "@nuxt/icon": "^2.5.1",
     "@pinia/nuxt": "^1.0.2",
     "alienmark": "workspace:*",
     "nuxt": "^4.5.2",
     "openapi-fetch": "^0.17.0",
     "pinia": "^4.0.3",
-    "vue": "^3.5.41",
-    "vue-router": "^5.2.0"
+    "vue": "^3.5.42",
+    "vue-router": "^5.3.0"
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^10.6.0",
