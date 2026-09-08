@@ -18,7 +18,7 @@ dependencies = [
   "environs==15.1.0",
   "nh3==0.3.7",
   "pillow==12.3.0",
-  "psycopg[binary]==3.3.4",
+  "psycopg[binary]==3.3.5",
   "requests==2.34.2",
   "user-agents==2.2.0",
 ]
