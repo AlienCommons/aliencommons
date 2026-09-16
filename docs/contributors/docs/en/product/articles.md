@@ -2,6 +2,15 @@
 
 Formal columns are the core content type of AlienCommons. They are suitable for complete technical writing intended for long-term reading.
 
+## Implementation status
+
+The rules below describe product intent. The current backend has a single author,
+separate source/snapshot/publication records, and an explicit `UNPUBLISHED` state.
+It permits soft deletion outside the pending-review state. Published sources
+cannot currently be edited directly; revising while keeping an old public version
+is not yet a complete flow. These differences need a deliberate product decision,
+not an incidental maintenance change. See [the implemented workflow](../architecture.md#article-review-and-publication-flow).
+
 ## Basic Content
 
 A column contains:

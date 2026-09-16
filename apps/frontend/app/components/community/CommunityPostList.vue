@@ -8,10 +8,6 @@ defineProps<{
 
 <template>
   <div class="grid gap-5">
-    <CommunityCommunityPostCard
-      v-for="post in posts"
-      :key="post.id"
-      :post="post"
-    />
+    <CommunityPostCard v-for="post in posts" :key="post.id" :post="post" />
   </div>
 </template>
