@@ -1,5 +1,9 @@
 # Product Positioning
 
+This section records product intent. It is not an inventory of shipped features.
+Use [Architecture](../architecture.md) for implemented flows and their tests, and
+[Open Questions](open-questions.md) for decisions that are still unconfirmed.
+
 AlienCommons is a column publishing platform for Technical Minecraft players. It encourages players to record, discuss, and share Minecraft technical knowledge in written, formal, and moderately academic forms.
 
 ## Why AlienCommons Exists

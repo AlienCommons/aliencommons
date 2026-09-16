@@ -26,7 +26,7 @@ Django 6 + DRF API for AlienCommons. Python 3.14, ASGI via Daphne/Channels. Depe
 | `core` | Shared utilities, responses, permissions, test helpers |
 | `logs` | (Referenced by ruff/lint scope; treat as app-shaped module) |
 
-> The ruff lint scope in CI is exactly: `articles bookmarks comments backend core logs notifications posts reactions reports tasks users manage.py`. When you add a new app, add it here, in `.github/workflows/ci.yml` (`backend-lint` step), and in any app-list settings (e.g. `INSTALLED_APPS`, router registries).
+> The Django app lint scope in CI is: `articles bookmarks comments backend core logs notifications posts reactions reports tasks users manage.py`. When you add a new app, add it here, in `.github/workflows/ci.yml` (`backend-lint` step), and in any app-list settings (e.g. `INSTALLED_APPS`, router registries). CI also lints `scripts/browser-backend.py`; `make backend-lint` covers both backend code and that launcher.
 
 ## Runtime services
 
@@ -43,7 +43,7 @@ Run inside `apps/backend/` unless noted. The Compose equivalents run inside the 
 
 | Action | Local | Compose |
 |---|---|---|
-| Tests | `uv run python manage.py test` (or `--settings=backend.settings.test`) | `make dev-backend-test` |
+| Tests | `uv run python manage.py test --settings=backend.settings.test` | `make dev-backend-test` |
 | System check | `uv run python manage.py check` | `make dev-backend-check` |
 | Lint | `uv run ruff check articles bookmarks comments backend core logs notifications posts reactions reports tasks users manage.py` | (run locally) |
 | Make migrations | `uv run python manage.py makemigrations` | `make dev-backend-makemigrations` |
@@ -59,8 +59,9 @@ Run inside `apps/backend/` unless noted. The Compose equivalents run inside the 
 
 - `backend.settings.base` — shared production-like foundation. Layer environment-specific behavior on top of it, not by editing base.
 - `backend.settings.dev` / `stg` / `pro` — deployment overlays.
+- `backend.settings.browser` — disposable local browser/demo environment derived from test settings. Start with `make browser-backend`; it creates and removes its own temporary database and media directory. Never use it for deployments.
 - `backend.settings.test` — **intentionally independent.** Must stay fast, deterministic, and isolated from PostgreSQL, Redis, S3, and external services unless a test explicitly opts into an integration path. Don't add network/IO dependencies to `test` casually.
-- `ruff.toml` allows `F403`/`F405` only inside `backend/settings/{dev,pro,stg}.py` (star-import settings files).
+- `ruff.toml` allows `F403`/`F405` only inside `backend/settings/{browser,dev,pro,stg}.py` (settings overlays).
 - Keep secrets/AWS credentials out of settings. EC2/ECS IAM roles should provide AWS creds in hosted environments — do not add static AWS keys.
 
 ## Architecture rules
@@ -83,6 +84,10 @@ Run inside `apps/backend/` unless noted. The Compose equivalents run inside the 
 - Add or update tests whenever behavior, permissions, workflow transitions, task scheduling, storage, or API contracts change — even if not explicitly requested.
 - Keep tests hermetic: use fixtures/factories, don't depend on `dev`/`stg` data or external HTTP.
 
+Use `core.tests.factories` and `BaseTestCase` / `BaseAPITestCase` for new tests.
+`seed_demo` is restricted to explicitly enabled disposable environments; its
+fixture graph is not a replacement for workflow service tests.
+
 ## API and data contracts
 
 - Responses wrapped in the standard envelope via `EnvelopeMixin` / `format_success_response`.
@@ -96,7 +101,7 @@ Run the smallest relevant check. If a check can't run, say so in the final respo
 
 ```bash
 # Tests (matches CI backend-tests job)
-uv run python manage.py test
+uv run python manage.py test --settings=backend.settings.test
 
 # Lint (matches CI backend-lint job scope exactly)
 uv run ruff check articles bookmarks comments backend core logs notifications posts reactions reports tasks users manage.py
