@@ -1,13 +1,14 @@
 # AlienCommons Frontend
 
-Minimal Nuxt 4 application scaffold.
+Nuxt 4 application with localized home, article and community pages, session
+authentication, typed API requests and shared UI components.
 
 ## Setup
 
 Make sure to install dependencies:
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 ```
 
 ## Development Server
@@ -52,3 +53,12 @@ pnpm preview
 
 The API layer design and usage examples are documented in
 [`app/api/README.md`](app/api/README.md).
+
+## Verification and demo
+
+From the repository root, run `pnpm turbo run check test typecheck --filter=frontend`.
+`check` is static validation; `test` executes the unit suite. Run
+`pnpm turbo run test:e2e --filter=frontend` for browser integration against a real,
+disposable Django backend. The [development setup guide](../../docs/contributors/docs/en/development/setup.md)
+covers prerequisites, Chromium installation and `make browser-backend` /
+`make browser-frontend` for manual exploration.

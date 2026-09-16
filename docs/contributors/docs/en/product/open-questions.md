@@ -9,6 +9,10 @@ This page collects product decisions that remain undecided. Contributors should 
 - Should an `Archived` state be added?
 - Which transitions should be allowed between states?
 
+The backend currently uses `UNPUBLISHED` after unpublishing and allows deletion
+outside pending review. Reconcile this implementation with the intended rules
+before changing it; see [Architecture](../architecture.md).
+
 ## Collections
 
 - After a multi-author work is added to a collection, should co-authors other than the collection creator have management permissions?
@@ -30,7 +34,10 @@ This page collects product decisions that remain undecided. Contributors should 
 
 ## Notifications
 
-The notification system as a whole remains undecided, including but not limited to:
+The backend already implements events, recipient deliveries, mentions, comment
+replies, subscribed-author publication notifications and read state. The frontend
+does not yet expose an inbox. See [the implemented flow](../architecture.md#notification-flow).
+The product policy and additional triggers below remain undecided:
 
 - Column approval, rejection, or unpublishing.
 - Comments on columns or community posts.

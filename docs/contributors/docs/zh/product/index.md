@@ -1,5 +1,8 @@
 # 产品定位
 
+本节记录产品目标，并非已上线功能清单。已实现流程及测试见[项目架构](../architecture.md)，
+尚未确认的决策见[开放问题](open-questions.md)。
+
 AlienCommons 是一个面向 Minecraft 技术向玩家（Technical Minecraft players）的专栏发布平台。它鼓励玩家以书面化、正式化和适度学术化的方式记录、讨论和传播 Minecraft 技术知识。
 
 ## 为什么需要 AlienCommons

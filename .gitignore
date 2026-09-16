@@ -69,6 +69,8 @@ lerna-debug.log*
 *.tsbuildinfo
 .eslintcache
 __screenshots__/
+playwright-report/
+test-results/
 *.timestamp-*-*.mjs
 /cypress/videos/
 /cypress/screenshots/

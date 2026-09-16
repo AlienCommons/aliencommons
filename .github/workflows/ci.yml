@@ -17,6 +17,9 @@ on:
       - "branding/LICENSE"
       - ".github/assets/**"
       - "scripts/check-licenses.mjs"
+      - "scripts/doctor.mjs"
+      - "scripts/browser-backend.py"
+      - "make/development.mk"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
@@ -48,6 +51,9 @@ on:
       - "branding/LICENSE"
       - ".github/assets/**"
       - "scripts/check-licenses.mjs"
+      - "scripts/doctor.mjs"
+      - "scripts/browser-backend.py"
+      - "make/development.mk"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
@@ -94,6 +100,8 @@ jobs:
             backend:
               - 'apps/backend/**'
               - 'packages/drf-std-response/**'
+              - 'scripts/browser-backend.py'
+              - 'make/development.mk'
               - 'pyproject.toml'
               - 'uv.lock'
             docs-contributors:
@@ -117,6 +125,8 @@ jobs:
               - 'branding/LICENSE'
               - '.github/assets/**'
               - 'scripts/check-licenses.mjs'
+              - 'scripts/doctor.mjs'
+              - 'make/development.mk'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
@@ -178,6 +188,7 @@ jobs:
           tasks
           users
           manage.py
+          ../../scripts/browser-backend.py
 
       - name: Validate committed OpenAPI schema
         env:
@@ -253,8 +264,73 @@ jobs:
       - name: Run Node checks
         run: pnpm run check
 
+      - name: Check development diagnostics
+        run: pnpm exec vp check scripts/doctor.mjs
+
+      - name: Run Node behavior tests
+        run: pnpm run test
+
+      - name: Check Vue component types
+        run: pnpm turbo run typecheck --filter=frontend
+
       - name: Audit repository licenses
         run: pnpm run license:check
+
+  browser-tests:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.node == 'true' || needs.changes.outputs.workflow == 'true'
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.11.23"
+          enable-cache: true
+          cache-suffix: browser-tests
+
+      - name: Install locked dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          uv sync --locked --dev --package aliencommons-backend
+
+      - name: Install Chromium
+        run: pnpm --filter frontend exec playwright install --with-deps chromium
+
+      - name: Run browser integration tests
+        run: pnpm turbo run test:e2e --filter=frontend
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-results
+          path: |
+            apps/frontend/playwright-report/
+            apps/frontend/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
 
   infra:
     runs-on: ubuntu-latest
