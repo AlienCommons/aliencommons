@@ -51,6 +51,7 @@
 "users/views/users.py" = ["RUF012"]
 # Preserve Django model bootstrap import order in this package initializer.
 "users/models/__init__.py" = ["I001"]
+"backend/settings/browser.py" = ["F403", "F405"]
 "backend/settings/dev.py" = ["F403", "F405"]
 "backend/settings/pro.py" = ["F403", "F405"]
 "backend/settings/stg.py" = ["F403", "F405"]

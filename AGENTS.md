@@ -69,19 +69,25 @@ The AWS Organizations management account is governance-only: do not deploy appli
 Run from the repository root unless noted.
 
 ```bash
+# Diagnose local prerequisites; see docs/contributors/docs/en/development/setup.md
+make doctor
+make backend-test           # Isolated local backend suite; no Docker required
+
 # Full local stack (Postgres, Redis, backend, workers, frontend, AlienMark, observability)
 make dev-up
 
 # Node workspace (matches CI `node` job)
 pnpm install
-pnpm run check              # Turbo: build deps, then per-package check
+pnpm run check              # Format, lint and TypeScript static checks
+pnpm run test               # Node behavior tests
+pnpm turbo run typecheck --filter=frontend  # Vue SFC type checks
 pnpm run knip               # advisory; pnpm run knip:strict to fail on findings
 
 # Backend (matches CI `backend-*` jobs)
 make dev-backend-test       # uses settings=test inside the backend-api container
 make dev-backend-check      # python manage.py check inside the backend-api container
 # Or locally inside apps/backend/:
-#   uv run python manage.py test
+#   uv run python manage.py test --settings=backend.settings.test
 #   uv run ruff check <app...> manage.py
 
 # Docs subproject (matches CI `docs-*` jobs); run inside docs/<name>/
@@ -107,8 +113,10 @@ Run the **smallest** check that covers your change. If a check cannot be run, sa
 
 | Change | Command |
 |---|---|
-| Any Node package (`apps/frontend`, `apps/alienmark`, `packages/alienmark`) | `pnpm run check` (full workspace) or `pnpm turbo run check --filter=<package>` (single package) |
-| Backend behavior | `uv run python manage.py test` from `apps/backend/`, or `make dev-backend-test` |
+| Node static checks | `pnpm turbo run check --filter=<package>` (or `pnpm run check` for the workspace) |
+| Node behavior | `pnpm turbo run test --filter=<package>`; `check` does not run tests |
+| Frontend types / browser behavior | `pnpm turbo run typecheck --filter=frontend`; `pnpm turbo run test:e2e --filter=frontend` for page, session, SSR or API integration changes |
+| Backend behavior | `uv run python manage.py test --settings=backend.settings.test` from `apps/backend/`, or `make dev-backend-test` |
 | Backend lint | `uv run ruff check <apps> manage.py` from `apps/backend/` |
 | API contract | Regenerate `apps/backend/openapi/v1.yaml`, then run `pnpm --filter frontend api:generate` and commit both generated artifacts |
 | Docs site | Run both strict Zensical builds from `docs/<name>/` (default English config, then `zensical.zh.toml`) |
@@ -148,47 +156,43 @@ CI mirrors these in `.github/workflows/ci.yml`. If your change alters app names,
 - Don't encode release versions in `AGENTS.md`.
 - Don't add a `Verification` section to PR descriptions unless explicitly asked.
 
-<!-- gitnexus:start -->
-# GitNexus — Code Intelligence
+## Code navigation and impact analysis
 
-This project is indexed by GitNexus as **aliencommons** (2806 symbols, 5287 relationships, 128 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+Use the official `turborepo` skill when available for Node workspace tasks,
+dependency filters and cache configuration. Keep Python and documentation checks
+on their documented uv/Make paths; Turbo does not model those dependencies.
 
-> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
+Use `make code-index-status` to check GitNexus freshness and `make code-index`
+to refresh the index without replacing this guide or installing generated skills.
+Pass `repo: "aliencommons"` explicitly in MCP calls when multiple repos are indexed.
+Treat partial/unknown results and cross-language resolution gaps as incomplete
+evidence, and supplement them with the manual checks below.
 
-## Always Do
+Before modifying an existing function, class or method, identify its callers,
+affected workflows and relevant tests. Report the blast radius and risk before
+editing. Group related symbols in one report when they share a workflow.
 
-- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
-- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: "compare", base_ref: "main"})`.
-- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
-- When exploring unfamiliar code, use `query({search_query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
-- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: "symbolName"})`.
-- For security review, `explain({target: "fileOrSymbol"})` lists taint findings (source→sink flows; needs `analyze --pdg`).
+Prefer GitNexus when its tools are available and its index matches the checkout:
 
-## Never Do
+- `query({search_query: "concept"})` for workflow discovery.
+- `context({name: "symbolName"})` for callers and callees.
+- `impact({target: "symbolName", direction: "upstream"})` before edits.
+- `detect_changes()` before committing; for branch reviews use the actual PR
+  base (normally `dev` for feature work, `main` for a release).
+- Report HIGH or CRITICAL findings before proceeding; inspect affected callers
+  and run targeted regression tests.
 
-- NEVER edit a function, class, or method without first running `impact` on it.
-- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
-- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.
-- NEVER commit changes without running `detect_changes()` to check affected scope.
+If GitNexus is missing, unavailable or stale, use `rg` to find definitions,
+imports, callers and framework registrations (routes, signals, tasks and Nuxt
+auto-imports), read those paths, and run the corresponding tests. State that
+this is a manual analysis and describe unresolved coverage. Tool availability
+must not silently bypass impact analysis or block routine work with a complete
+manual alternative. Use language-aware rename tools when available; otherwise
+review every definition/reference and validate the rename with types and tests.
 
-## Resources
+Before committing without GitNexus, inspect `git diff --check`, the complete diff
+and changed-file list; verify only intended code, contracts and workflows changed.
 
-| Resource | Use for |
-|----------|---------|
-| `gitnexus://repo/aliencommons/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/aliencommons/clusters` | All functional areas |
-| `gitnexus://repo/aliencommons/processes` | All execution flows |
-| `gitnexus://repo/aliencommons/process/{name}` | Step-by-step execution trace |
-
-## CLI
-
-| Task | Read this skill file |
-|------|---------------------|
-| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
-| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
-| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
-| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
-| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
-| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
-
-<!-- gitnexus:end -->
+See [development setup](docs/contributors/docs/en/development/setup.md#optional-code-navigation)
+for optional GitNexus setup. Shared instructions belong in version control;
+indexes, credentials and personal agent settings do not.

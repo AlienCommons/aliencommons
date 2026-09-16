@@ -17,7 +17,8 @@
     "lint:fix": "vp lint --fix",
     "preview": "nuxt preview",
     "test": "vp test run",
-    "typecheck": "vue-tsc --noEmit",
+    "test:e2e": "node ../../scripts/doctor.mjs --browser && playwright test",
+    "typecheck": "vue-tsc --build --noEmit",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^10.6.0",
+    "@playwright/test": "1.62.1",
     "@tailwindcss/vite": "^4.3.3",
     "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4.3.3"
