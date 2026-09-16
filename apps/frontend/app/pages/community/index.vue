@@ -48,8 +48,8 @@ const { data, error, refresh, status } = await useCommunityPostList(page);
       :title="$t('community.empty.title')"
     />
     <template v-else>
-      <CommunityCommunityPostList class="mt-10" :posts="data.results" />
-      <CommunityCommunityPagination
+      <CommunityPostList class="mt-10" :posts="data.results" />
+      <CommunityPagination
         v-if="data.total_pages > 1"
         :current-page="data.current_page"
         :total-pages="data.total_pages"

@@ -112,7 +112,7 @@ const latestPosts = computed(
         :description="$t('community.empty.description')"
         :title="$t('community.empty.title')"
       />
-      <CommunityCommunityPostList v-else class="mt-8" :posts="latestPosts" />
+      <CommunityPostList v-else class="mt-8" :posts="latestPosts" />
     </section>
   </div>
 </template>

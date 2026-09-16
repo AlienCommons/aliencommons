@@ -12,6 +12,11 @@ const form = reactive({
 });
 const errorKey = shallowRef<string>();
 const pending = shallowRef(false);
+const hydrated = shallowRef(false);
+
+onMounted(() => {
+  hydrated.value = true;
+});
 
 async function submit(): Promise<void> {
   errorKey.value = undefined;
@@ -33,12 +38,13 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-  <form class="space-y-5" @submit.prevent="submit">
+  <form class="space-y-5" method="post" @submit.prevent="submit">
     <UiFormField id="email" :label="$t('auth.login.email')" required>
       <template #default="{ describedBy, id, invalid }">
         <UiBaseInput
           :id="id"
           v-model="form.email"
+          :disabled="!hydrated || pending"
           :aria-describedby="describedBy"
           autocomplete="email"
           inputmode="email"
@@ -55,6 +61,7 @@ async function submit(): Promise<void> {
         <UiBaseInput
           :id="id"
           v-model="form.password"
+          :disabled="!hydrated || pending"
           :aria-describedby="describedBy"
           autocomplete="current-password"
           :invalid="invalid"
@@ -67,7 +74,7 @@ async function submit(): Promise<void> {
 
     <UiFormError v-if="errorKey" :message="$t(errorKey)" />
 
-    <UiBaseButton block :loading="pending" type="submit">
+    <UiBaseButton block :disabled="!hydrated" :loading="pending" type="submit">
       {{ pending ? $t("auth.login.submitting") : $t("auth.login.submit") }}
     </UiBaseButton>
   </form>
