@@ -17,6 +17,8 @@ on:
       - "branding/LICENSE"
       - ".github/assets/**"
       - "scripts/check-licenses.mjs"
+      - "scripts/dependency-security.test.mjs"
+      - "patches/**"
       - "scripts/doctor.mjs"
       - "scripts/browser-backend.py"
       - "make/development.mk"
@@ -51,6 +53,8 @@ on:
       - "branding/LICENSE"
       - ".github/assets/**"
       - "scripts/check-licenses.mjs"
+      - "scripts/dependency-security.test.mjs"
+      - "patches/**"
       - "scripts/doctor.mjs"
       - "scripts/browser-backend.py"
       - "make/development.mk"
@@ -125,6 +129,8 @@ jobs:
               - 'branding/LICENSE'
               - '.github/assets/**'
               - 'scripts/check-licenses.mjs'
+              - 'scripts/dependency-security.test.mjs'
+              - 'patches/**'
               - 'scripts/doctor.mjs'
               - 'make/development.mk'
               - 'package.json'
@@ -269,6 +275,9 @@ jobs:
 
       - name: Run Node behavior tests
         run: pnpm run test
+
+      - name: Verify dependency security patches
+        run: node --test scripts/dependency-security.test.mjs
 
       - name: Check Vue component types
         run: pnpm turbo run typecheck --filter=frontend

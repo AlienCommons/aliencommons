@@ -8,6 +8,18 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
 
+minimumReleaseAgeExclude:
+  # Includes the fix for GHSA-cf2h-pxjq-68xw in the new major.
+  - minimatch@11.0.7
+
 overrides:
-  js-yaml: 4.3.1
+  js-yaml: 4.3.2
+  # Security fixes require new majors; preserve minimatch 5's callable API.
+  "glob@>=9 <14.0.2": 14.0.4
+  "minimatch@>=7 <11.0.7": 11.0.7
   typescript: npm:typescript-native-bridge@6.0.3-bridge.7.tsgo.7.0.2
+
+patchedDependencies:
+  # GHSA-gcqx-w48m-w2h4: upstream has no published fixed release yet.
+  # Keep until Rollup can resolve a fixed release; regression test runs in CI.
+  deepmerge@4.3.1: patches/deepmerge@4.3.1.patch

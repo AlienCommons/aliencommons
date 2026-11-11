@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import type { VitePlugin } from "nuxt/schema";
 
 const apiInternalBase = process.env.NUXT_API_INTERNAL_BASE?.trim();
 
@@ -59,6 +60,7 @@ export default defineNuxtConfig({
     },
   },
   vite: {
-    plugins: [tailwindcss()],
+    // Use Nuxt's Vite type at the plugin boundary to avoid recursive comparison.
+    plugins: tailwindcss() as VitePlugin[],
   },
 });
