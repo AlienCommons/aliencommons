@@ -22,20 +22,20 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxt/icon": "^2.5.1",
-    "@pinia/nuxt": "^1.0.2",
+    "@nuxt/icon": "^2.6.2",
+    "@pinia/nuxt": "^1.0.3",
     "alienmark": "workspace:*",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.4",
     "openapi-fetch": "^0.17.0",
-    "pinia": "^4.0.3",
-    "vue": "^3.5.43",
-    "vue-router": "^5.3.1"
+    "pinia": "^4.1.0",
+    "vue": "^3.5.45",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^10.6.0",
-    "@playwright/test": "1.63.0",
-    "@tailwindcss/vite": "^4.3.3",
+    "@playwright/test": "1.65.0",
+    "@tailwindcss/vite": "^4.3.4",
     "openapi-typescript": "^7.13.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.4"
   }
 }
