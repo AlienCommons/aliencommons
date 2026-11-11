@@ -18,13 +18,13 @@ dependencies = [
   "environs==15.2.0",
   "nh3==0.3.7",
   "pillow==12.3.0",
-  "psycopg[binary]==3.3.6",
+  "psycopg[binary]==3.3.8",
   "requests==2.34.2",
   "user-agents==2.2.0",
 ]
 
 [dependency-groups]
-dev = ["ruff==0.16.10"]
+dev = ["ruff==0.17.4"]
 
 [tool.uv]
 add-bounds = "exact"
