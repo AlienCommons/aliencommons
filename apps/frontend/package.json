@@ -29,13 +29,13 @@
     "openapi-fetch": "^0.17.0",
     "pinia": "^4.1.0",
     "vue": "^3.5.45",
-    "vue-router": "^5.4.0"
+    "vue-router": "^5.5.0"
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^10.6.0",
     "@playwright/test": "1.65.0",
-    "@tailwindcss/vite": "^4.3.4",
+    "@tailwindcss/vite": "^4.3.5",
     "openapi-typescript": "^7.13.0",
-    "tailwindcss": "^4.3.4"
+    "tailwindcss": "^4.3.5"
   }
 }
