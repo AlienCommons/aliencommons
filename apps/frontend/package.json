@@ -22,18 +22,18 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxt/icon": "^2.6.2",
+    "@nuxt/icon": "^2.6.3",
     "@pinia/nuxt": "^1.0.3",
     "alienmark": "workspace:*",
     "nuxt": "^4.6.4",
     "openapi-fetch": "^0.17.0",
     "pinia": "^4.1.0",
-    "vue": "^3.5.45",
-    "vue-router": "^5.5.0"
+    "vue": "^3.5.46",
+    "vue-router": "^5.5.1"
   },
   "devDependencies": {
     "@nuxtjs/i18n": "^10.6.0",
-    "@playwright/test": "1.65.0",
+    "@playwright/test": "1.65.1",
     "@tailwindcss/vite": "^4.3.5",
     "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4.3.5"
